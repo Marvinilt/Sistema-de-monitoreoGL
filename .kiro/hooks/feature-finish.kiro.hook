@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Finalizar Feature - Docs y Commit",
+  "description": "Cuando el usuario indique que terminó el desarrollo de un feature, el agente actualiza README.md y DocumentacionTecnica.md y guía al usuario para hacer el commit final con mensaje descriptivo",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "El usuario indica que terminó el desarrollo de una funcionalidad. Sigue el flujo GitFlow definido en dev-workflow.md:\n1. Pregunta al usuario qué funcionalidad terminó, el nombre del branch feature y un resumen de lo implementado si no lo proporcionó.\n2. Actualiza el archivo README.md en la raíz del proyecto agregando la nueva funcionalidad con descripción e instrucciones de uso y la fecha de hoy.\n3. Actualiza el archivo docs/DocumentacionTecnica.md con la descripción técnica detallada: arquitectura, componentes, decisiones de diseño, endpoints o métodos relevantes, dependencias nuevas y fecha de hoy.\n4. Genera el mensaje de commit siguiendo el formato convencional definido en dev-workflow.md y muéstraselo al usuario para que lo use al hacer el commit.\n5. Consulta los repositorios del proyecto Munis-MonitorServers en ADO para obtener el repositoryId correcto.\n6. Crea un Pull Request en ADO con: rama origen el branch feature del usuario, rama destino 'develop', título con formato feat(<scope>): <descripcion>, y descripción detallada que incluya qué se implementó, por qué, cómo probarlo y los cambios en documentación."
+  }
+}

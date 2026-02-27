@@ -1,0 +1,39 @@
+// Tipos del frontend — espejo de los tipos del backend
+
+export type EstadoServidor = 'ok' | 'alerta' | 'desconocido';
+export type EstadoUrl = 'disponible' | 'no_disponible' | 'error_certificado' | 'desconocido';
+export type EstadoPuerto = 'abierto' | 'cerrado' | 'sin_respuesta';
+
+export interface UrlMonitoreada {
+  id: string;
+  url: string;
+  estado: EstadoUrl;
+  codigoHttp: number | null;
+  errorCertificado: boolean;
+  ultimaVerificacion: string | null;
+}
+
+export interface Servidor {
+  id: string;
+  nombre: string;
+  host: string;
+  puertos: number[];
+  urls: UrlMonitoreada[];
+  estado: EstadoServidor;
+  ultimaVerificacion: string | null;
+  creadoEn: string;
+}
+
+export interface ResultadoPuerto {
+  puerto: number;
+  estado: EstadoPuerto;
+  latenciaMs: number | null;
+}
+
+export interface ConfiguracionApp {
+  intervaloMonitoreoSegundos: number;
+}
+
+export type EventoWebSocket =
+  | { tipo: 'server-update'; datos: Servidor }
+  | { tipo: 'check-progress'; datos: { servidorId: string; enProgreso: boolean } };

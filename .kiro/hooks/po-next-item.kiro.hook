@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "PO - Siguiente Item del Backlog",
+  "description": "Sugiere el siguiente PBI a desarrollar según prioridad del backlog, actualiza el work item anterior a Done y vincula el PR correspondiente",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "#product-owner.md\n\nActúa como Product Owner siguiendo las reglas de product-owner.md. El usuario quiere saber qué desarrollar a continuación.\n\n1. Consulta los work items activos del proyecto Munis-MonitorServers en ADO (User Stories en estado New o Active).\n2. Presenta la lista ordenada por prioridad (Critical → High → Medium → Low) y MoSCoW.\n3. Recomienda el siguiente PBI a desarrollar justificando la elección (prioridad, dependencias resueltas, valor de negocio).\n4. Si el usuario confirma, activa el flujo de inicio de feature: sugiere el nombre del branch siguiendo el formato feature/<nombre> del dev-workflow.md y ofrece crearlo en ADO.\n5. Marca el work item seleccionado como \"Active\" en ADO."
+  }
+}

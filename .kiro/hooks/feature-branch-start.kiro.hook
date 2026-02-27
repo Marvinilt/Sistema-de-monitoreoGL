@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Iniciar Feature - Crear Branch",
+  "description": "Cuando el usuario mencione que va a iniciar una nueva funcionalidad, el agente crea automáticamente un branch en ADO con el formato feature/<descripcion> desde main",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "El usuario quiere iniciar el desarrollo de una nueva funcionalidad. Sigue el flujo definido en dev-workflow.md:\n1. Si el usuario no proporcionó una descripción clara de la funcionalidad, pregúntale antes de continuar.\n2. Genera un nombre de branch con el formato: feature/<descripcion-corta-en-kebab-case>\n3. Consulta los repositorios disponibles en el proyecto Munis-MonitorServers en ADO y pregunta al usuario en cuál repo crear el branch si hay más de uno.\n4. Crea el branch desde main usando el MCP de ADO.\n5. Confirma al usuario el branch creado y que puede iniciar el desarrollo."
+  }
+}
