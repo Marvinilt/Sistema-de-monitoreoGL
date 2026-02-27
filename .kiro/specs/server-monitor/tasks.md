@@ -24,29 +24,29 @@ Implementación incremental de la aplicación de monitoreo, comenzando por la es
     - Validación de formato de URL y duplicados
     - _Requisitos: 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4_
 
-  - [ ]* 2.2 Escribir prueba de propiedad: Registro y recuperación de servidor
+  - [ ] 2.2 Escribir prueba de propiedad: Registro y recuperación de servidor
     - **Propiedad 1: Registro de servidor persiste y es recuperable**
     - **Valida: Requisitos 1.1, 1.3**
     - Usar `fast-check` con `fc.ipV4()` y `fc.string()` para generar datos aleatorios
 
-  - [ ]* 2.3 Escribir prueba de propiedad: Eliminación completa de servidor
+  - [ ] 2.3 Escribir prueba de propiedad: Eliminación completa de servidor
     - **Propiedad 2: Eliminación de servidor es completa**
     - **Valida: Requisitos 1.2**
 
-  - [ ]* 2.4 Escribir prueba de propiedad: Rechazo de servidores duplicados
+  - [ ] 2.4 Escribir prueba de propiedad: Rechazo de servidores duplicados
     - **Propiedad 3: Rechazo de servidores duplicados**
     - **Valida: Requisitos 1.4**
 
-  - [ ]* 2.5 Escribir prueba de propiedad: Validación de puertos
+  - [ ] 2.5 Escribir prueba de propiedad: Validación de puertos
     - **Propiedad 4: Validación de puertos rechaza entradas inválidas**
     - **Valida: Requisitos 2.3, 2.4**
     - Generar enteros fuera de [0, 65535] con `fc.integer({ max: -1 })` y `fc.integer({ min: 65536 })`
 
-  - [ ]* 2.6 Escribir prueba de propiedad: Validación de URLs
+  - [ ] 2.6 Escribir prueba de propiedad: Validación de URLs
     - **Propiedad 5: Validación de URLs rechaza entradas inválidas**
     - **Valida: Requisitos 3.3, 3.4**
 
-  - [ ]* 2.7 Escribir prueba de propiedad: Round-trip de configuración JSON
+  - [ ] 2.7 Escribir prueba de propiedad: Round-trip de configuración JSON
     - **Propiedad 10: Persistencia round-trip de configuración**
     - **Valida: Requisitos 1.3**
     - Generar configuraciones válidas aleatorias, serializar y deserializar, verificar equivalencia
@@ -67,7 +67,7 @@ Implementación incremental de la aplicación de monitoreo, comenzando por la es
     - Clasificar códigos HTTP: 200-399 → `disponible`, >=400 → `no_disponible`
     - _Requisitos: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ]* 4.3 Escribir prueba de propiedad: Clasificación de estado HTTP
+  - [ ] 4.3 Escribir prueba de propiedad: Clasificación de estado HTTP
     - **Propiedad 6: Clasificación de estado HTTP es exhaustiva y correcta**
     - **Valida: Requisitos 5.2, 5.3**
     - Usar `fc.integer({ min: 200, max: 399 })` y `fc.integer({ min: 400, max: 599 })`
