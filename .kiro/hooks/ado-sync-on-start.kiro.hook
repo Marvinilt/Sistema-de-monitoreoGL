@@ -1,0 +1,12 @@
+{
+  "name": "ADO - Sincronizar Task al Iniciar",
+  "version": "1.0.0",
+  "description": "Antes de iniciar el desarrollo de un task planificado en Kiro, sincroniza el work item correspondiente en ADO marcándolo como Active.",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "El usuario va a iniciar el desarrollo de un task planificado en Kiro. Realiza la sincronización con ADO antes de continuar:\n\n1. Lee el archivo tasks.md del spec activo en `.kiro/specs/` y pregunta al usuario qué task va a desarrollar si no lo especificó.\n2. Busca en ADO (proyecto Munis-MonitorServers) el work item correspondiente al task por título o descripción.\n3. Si el work item existe, actualiza su estado a 'Active' y asígnalo a mlemus@minfin.gob.gt si no tiene asignado.\n4. Si el work item no existe, créalo como Task bajo el Feature o User Story correspondiente, con estado 'Active' y asignado a mlemus@minfin.gob.gt.\n5. Confirma al usuario la sincronización realizada (ID y título del work item en ADO) y que puede proceder con el desarrollo."
+  }
+}

@@ -60,6 +60,35 @@ Cuando el usuario indique que terminó el desarrollo de un feature, se deben rea
      - Cómo probarlo
      - Cambios en documentación
 
+## Sincronización con Azure DevOps durante el desarrollo
+
+### Al iniciar el desarrollo de un task de Kiro
+
+Antes de escribir cualquier código, el agente DEBE:
+
+1. Leer el archivo `tasks.md` del spec activo para identificar el task a desarrollar
+2. Buscar en ADO (proyecto `Munis-MonitorServers`) el work item correspondiente al task por título o descripción
+3. Si el work item existe, actualizarlo a estado `Active`
+4. Si no existe, crearlo como `Task` bajo el Feature o User Story correspondiente y marcarlo como `Active`
+5. Recién después de completar la sincronización, iniciar el desarrollo
+
+### Al finalizar el desarrollo de un task de Kiro
+
+Cuando el agente complete exitosamente un task (código implementado, tests pasando), DEBE:
+
+1. Buscar en ADO el work item correspondiente al task completado
+2. Actualizarlo a estado `Done` o `Closed`
+3. Si existe un Pull Request asociado al feature, vincularlo al work item
+4. Buscar el Feature padre en ADO y verificar si todos sus PBIs/Tasks están Done — si es así, actualizar el Feature a `Done` también
+5. Reportar al usuario la sincronización realizada
+
+### Reglas de mapeo task → work item
+
+- El título del task en `tasks.md` se usa como criterio de búsqueda en ADO
+- Si hay ambigüedad (múltiples work items similares), preguntar al usuario cuál corresponde
+- Nunca crear duplicados: verificar existencia antes de crear
+- El proyecto ADO siempre es `Munis-MonitorServers`
+
 ## Convenciones generales
 
 - Nunca hacer commits directamente a `main` ni a `develop`
