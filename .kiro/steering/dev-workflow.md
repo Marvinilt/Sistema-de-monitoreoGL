@@ -1,7 +1,3 @@
----
-inclusion: manual
----
-
 # Development Workflow Rules (GitFlow)
 
 ## Estructura de ramas
