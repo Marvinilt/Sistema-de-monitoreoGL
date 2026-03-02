@@ -18,6 +18,7 @@ export interface Servidor {
   nombre: string;
   host: string; // IP o hostname
   puertos: number[];
+  resultadosPuertos: ResultadoPuerto[]; // último resultado por puerto
   urls: UrlMonitoreada[];
   estado: EstadoServidor;
   ultimaVerificacion: string | null; // ISO 8601

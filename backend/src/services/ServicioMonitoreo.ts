@@ -43,7 +43,7 @@ export class ServicioMonitoreo {
       };
     });
 
-    this.store.actualizarEstadoServidor(servidorId, estadoGeneral, urlsActualizadas);
+    this.store.actualizarEstadoServidor(servidorId, estadoGeneral, urlsActualizadas, puertos);
     this.onUpdate?.(servidorId);
 
     return {
