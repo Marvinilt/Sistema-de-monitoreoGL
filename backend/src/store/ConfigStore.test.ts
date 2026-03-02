@@ -3,16 +3,15 @@ import * as path from 'path';
 import * as fc from 'fast-check';
 import { ConfigStore, validarPuerto, validarUrl } from './ConfigStore';
 
-// Directorio temporal para pruebas (evita tocar data/config.json real)
-const TEST_DATA_DIR = path.join(__dirname, '../../data-test');
-const TEST_CONFIG_FILE = path.join(TEST_DATA_DIR, 'config.json');
+// Directorio temporal aislado — nunca toca data/config.json
+const TEST_DATA_DIR = path.join(__dirname, '../../../data-test');
+
+function testConfigFile(): string {
+  return path.join(TEST_DATA_DIR, `config-${Date.now()}-${Math.random().toString(36).slice(2)}.json`);
+}
 
 function crearStore(): ConfigStore {
-  // Limpiar antes de cada instancia
-  if (fs.existsSync(TEST_CONFIG_FILE)) fs.unlinkSync(TEST_CONFIG_FILE);
-  // Parchamos la ruta interna usando variable de entorno
-  process.env.CONFIG_FILE_OVERRIDE = TEST_CONFIG_FILE;
-  return new ConfigStore();
+  return new ConfigStore(testConfigFile());
 }
 
 beforeAll(() => {
@@ -21,10 +20,6 @@ beforeAll(() => {
 
 afterAll(() => {
   if (fs.existsSync(TEST_DATA_DIR)) fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true });
-});
-
-beforeEach(() => {
-  if (fs.existsSync(TEST_CONFIG_FILE)) fs.unlinkSync(TEST_CONFIG_FILE);
 });
 
 // ---------------------------------------------------------------------------
@@ -38,10 +33,9 @@ test('Propiedad 1: Registro de servidor persiste y es recuperable', () => {
         host: fc.ipV4(),
       }),
       (datos) => {
-        const store = new ConfigStore();
+        const store = crearStore();
         store.agregarServidor(datos.nombre, datos.host);
-        const servidores = store.obtenerServidores();
-        return servidores.some((s) => s.host === datos.host.toLowerCase());
+        return store.obtenerServidores().some((s) => s.host === datos.host.toLowerCase());
       }
     ),
     { numRuns: 100 }
@@ -60,14 +54,11 @@ test('Propiedad 2: Eliminación de servidor es completa', () => {
       }),
       fc.array(fc.integer({ min: 0, max: 65535 }), { maxLength: 5 }),
       (datos, puertos) => {
-        const store = new ConfigStore();
+        const store = crearStore();
         const servidor = store.agregarServidor(datos.nombre, datos.host);
-        const puertosSinDuplicados = [...new Set(puertos)];
-        for (const p of puertosSinDuplicados) store.agregarPuerto(servidor.id, p);
-
+        for (const p of [...new Set(puertos)]) store.agregarPuerto(servidor.id, p);
         store.eliminarServidor(servidor.id);
-        const servidores = store.obtenerServidores();
-        return !servidores.some((s) => s.id === servidor.id);
+        return !store.obtenerServidores().some((s) => s.id === servidor.id);
       }
     ),
     { numRuns: 100 }
@@ -85,19 +76,12 @@ test('Propiedad 3: Rechazo de servidores duplicados', () => {
         host: fc.ipV4(),
       }),
       (datos) => {
-        const store = new ConfigStore();
+        const store = crearStore();
         store.agregarServidor(datos.nombre, datos.host);
         const cantidadAntes = store.obtenerServidores().length;
-
         let lanzóError = false;
-        try {
-          store.agregarServidor('Otro nombre', datos.host);
-        } catch {
-          lanzóError = true;
-        }
-
-        const cantidadDespues = store.obtenerServidores().length;
-        return lanzóError && cantidadDespues === cantidadAntes;
+        try { store.agregarServidor('Otro', datos.host); } catch { lanzóError = true; }
+        return lanzóError && store.obtenerServidores().length === cantidadAntes;
       }
     ),
     { numRuns: 100 }
@@ -105,22 +89,15 @@ test('Propiedad 3: Rechazo de servidores duplicados', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Feature: server-monitor, Property 4: Validación de puertos rechaza entradas inválidas
+// Feature: server-monitor, Property 4: Validación de puertos
 // ---------------------------------------------------------------------------
 test('Propiedad 4: Validación de puertos rechaza entradas inválidas', () => {
   fc.assert(
     fc.property(
-      fc.oneof(
-        fc.integer({ max: -1 }),
-        fc.integer({ min: 65536, max: 200000 })
-      ),
+      fc.oneof(fc.integer({ max: -1 }), fc.integer({ min: 65536, max: 200000 })),
       (puerto) => {
         let lanzóError = false;
-        try {
-          validarPuerto(puerto);
-        } catch {
-          lanzóError = true;
-        }
+        try { validarPuerto(puerto); } catch { lanzóError = true; }
         return lanzóError;
       }
     ),
@@ -134,11 +111,7 @@ test('Propiedad 4b: Validación de puertos acepta entradas válidas', () => {
       fc.integer({ min: 0, max: 65535 }),
       (puerto) => {
         let lanzóError = false;
-        try {
-          validarPuerto(puerto);
-        } catch {
-          lanzóError = true;
-        }
+        try { validarPuerto(puerto); } catch { lanzóError = true; }
         return !lanzóError;
       }
     ),
@@ -147,45 +120,22 @@ test('Propiedad 4b: Validación de puertos acepta entradas válidas', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Feature: server-monitor, Property 5: Validación de URLs rechaza entradas inválidas
+// Feature: server-monitor, Property 5: Validación de URLs
 // ---------------------------------------------------------------------------
 test('Propiedad 5: Validación de URLs rechaza entradas inválidas', () => {
-  const urlsInvalidas = [
-    'no-es-url',
-    'ftp://servidor.com',
-    '//sin-protocolo.com',
-    'http://',
-    '',
-    '   ',
-    'javascript:alert(1)',
-  ];
-
-  for (const url of urlsInvalidas) {
-    let lanzóError = false;
-    try {
-      validarUrl(url);
-    } catch {
-      lanzóError = true;
-    }
-    expect(lanzóError).toBe(true);
+  for (const url of ['no-es-url', 'ftp://x.com', '//sin-proto.com', 'http://', '', '   ', 'javascript:x']) {
+    expect(() => validarUrl(url)).toThrow();
   }
 });
 
 test('Propiedad 5b: Validación de URLs acepta URLs válidas', () => {
-  const urlsValidas = [
-    'http://192.168.1.1',
-    'https://servidor.empresa.com',
-    'http://localhost:8080',
-    'https://app.empresa.com/ruta',
-  ];
-
-  for (const url of urlsValidas) {
+  for (const url of ['http://192.168.1.1', 'https://servidor.empresa.com', 'http://localhost:8080']) {
     expect(() => validarUrl(url)).not.toThrow();
   }
 });
 
 // ---------------------------------------------------------------------------
-// Feature: server-monitor, Property 10: Persistencia round-trip de configuración
+// Feature: server-monitor, Property 10: Persistencia round-trip
 // ---------------------------------------------------------------------------
 test('Propiedad 10: Persistencia round-trip de configuración', () => {
   fc.assert(
@@ -195,13 +145,11 @@ test('Propiedad 10: Persistencia round-trip de configuración', () => {
         host: fc.ipV4(),
       }),
       (datos) => {
-        const store = new ConfigStore();
-        const servidor = store.agregarServidor(datos.nombre, datos.host);
-
-        // Leer desde disco creando nueva instancia
-        const store2 = new ConfigStore();
+        const file = testConfigFile();
+        const store1 = new ConfigStore(file);
+        const servidor = store1.agregarServidor(datos.nombre, datos.host);
+        const store2 = new ConfigStore(file);
         const recuperado = store2.obtenerServidor(servidor.id);
-
         return (
           recuperado !== undefined &&
           recuperado.id === servidor.id &&

@@ -9,8 +9,8 @@ import {
   EstadoServidor,
 } from '../types';
 
-const DATA_DIR = path.join(__dirname, '../../data');
-const CONFIG_FILE = path.join(DATA_DIR, 'config.json');
+const DEFAULT_DATA_DIR = path.join(__dirname, '../../data');
+const DEFAULT_CONFIG_FILE = path.join(DEFAULT_DATA_DIR, 'config.json');
 
 const CONFIG_DEFAULT: ConfiguracionCompleta = {
   configuracion: { intervaloMonitoreoSegundos: 60 },
@@ -19,8 +19,12 @@ const CONFIG_DEFAULT: ConfiguracionCompleta = {
 
 export class ConfigStore {
   private datos: ConfiguracionCompleta;
+  private configFile: string;
+  private dataDir: string;
 
-  constructor() {
+  constructor(configFilePath?: string) {
+    this.configFile = configFilePath ?? DEFAULT_CONFIG_FILE;
+    this.dataDir = path.dirname(this.configFile);
     this.datos = this.cargar();
   }
 
@@ -28,23 +32,29 @@ export class ConfigStore {
 
   private cargar(): ConfiguracionCompleta {
     try {
-      if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-      if (!fs.existsSync(CONFIG_FILE)) {
-        fs.writeFileSync(CONFIG_FILE, JSON.stringify(CONFIG_DEFAULT, null, 2), 'utf-8');
+      if (!fs.existsSync(this.dataDir)) fs.mkdirSync(this.dataDir, { recursive: true });
+      if (!fs.existsSync(this.configFile)) {
+        fs.writeFileSync(this.configFile, JSON.stringify(CONFIG_DEFAULT, null, 2), 'utf-8');
         return JSON.parse(JSON.stringify(CONFIG_DEFAULT));
       }
-      const contenido = fs.readFileSync(CONFIG_FILE, 'utf-8');
-      return JSON.parse(contenido) as ConfiguracionCompleta;
+      const contenido = fs.readFileSync(this.configFile, 'utf-8');
+      const datos = JSON.parse(contenido) as ConfiguracionCompleta;
+      // Retrocompatibilidad: asegurar que todos los servidores tengan resultadosPuertos
+      datos.servidores = datos.servidores.map((s) => ({
+        ...s,
+        resultadosPuertos: s.resultadosPuertos ?? [],
+      }));
+      return datos;
     } catch {
       return JSON.parse(JSON.stringify(CONFIG_DEFAULT));
     }
   }
 
   private guardar(): void {
-    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-    const tmp = CONFIG_FILE + '.tmp';
+    if (!fs.existsSync(this.dataDir)) fs.mkdirSync(this.dataDir, { recursive: true });
+    const tmp = this.configFile + '.tmp';
     fs.writeFileSync(tmp, JSON.stringify(this.datos, null, 2), 'utf-8');
-    fs.renameSync(tmp, CONFIG_FILE);
+    fs.renameSync(tmp, this.configFile);
   }
 
   // --- Servidores ---
@@ -72,6 +82,7 @@ export class ConfigStore {
       nombre: nombre.trim(),
       host: hostNorm,
       puertos: [],
+      resultadosPuertos: [],
       urls: [],
       estado: 'desconocido' as EstadoServidor,
       ultimaVerificacion: null,
@@ -161,12 +172,14 @@ export class ConfigStore {
   actualizarEstadoServidor(
     servidorId: string,
     estado: EstadoServidor,
-    urls?: UrlMonitoreada[]
+    urls?: UrlMonitoreada[],
+    resultadosPuertos?: import('../types').ResultadoPuerto[]
   ): void {
     const servidor = this._getServidor(servidorId);
     servidor.estado = estado;
     servidor.ultimaVerificacion = new Date().toISOString();
     if (urls) servidor.urls = urls;
+    if (resultadosPuertos) servidor.resultadosPuertos = resultadosPuertos;
     this.guardar();
   }
 

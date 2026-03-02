@@ -18,6 +18,7 @@ export interface Servidor {
   nombre: string;
   host: string;
   puertos: number[];
+  resultadosPuertos: ResultadoPuerto[]; // último resultado por puerto
   urls: UrlMonitoreada[];
   estado: EstadoServidor;
   ultimaVerificacion: string | null;
