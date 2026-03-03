@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "description": "Al finalizar cada ejecución del agente, sincroniza el estado del task completado en ADO: marca el work item como Done y verifica si el Feature padre también puede cerrarse.",
   "when": {
-    "type": "agentStop"
+    "type": "userTriggered"
   },
   "then": {
     "type": "askAgent",
-    "prompt": "El agente acaba de terminar una ejecución. Revisa si se completó algún task de desarrollo en esta sesión:\n\n1. Lee el archivo tasks.md del spec activo en `.kiro/specs/` para identificar qué tasks cambiaron a estado completado en esta sesión.\n2. Para cada task completado, busca el work item correspondiente en ADO (proyecto Munis-MonitorServers) por título o descripción.\n3. Si el work item existe y no está en estado Done/Closed, actualízalo a 'Done'.\n4. Busca el Feature o User Story padre del work item y verifica si todos sus tasks/hijos están Done. Si es así, actualiza el Feature a 'Done' también.\n5. Si existe un Pull Request activo en el branch feature actual, vincúlalo al work item usando el MCP de ADO.\n6. Si no se completó ningún task de desarrollo en esta sesión (fue solo una consulta o revisión), no hagas nada y termina silenciosamente.\n7. Reporta brevemente al usuario qué work items se actualizaron en ADO."
-  }
+    "prompt": "El agente acaba de terminar una ejecución. Revisa si se completó algún task de desarrollo en esta sesión:\n\n1. Lee el archivo tasks.md del spec activo en `.kiro/specs/` para identificar qué tasks cambiaron a estado completado en esta sesión.\n2. Para cada task completado, busca el ID del work item asociado al task en ADO (proyecto Munis-MonitorServers).\n3. Si el work item existe y no está en estado Done/Closed, actualízalo a 'Done'.\n4. Busca el Feature o User Story padre del work item y verifica si todos sus tasks/hijos están Done. Si es así, actualiza el Feature a 'Done' también.\n5. Si existe un Pull Request activo en el branch feature actual, vincúlalo al work item usando el MCP de ADO.\n6. Si no se completó ningún task de desarrollo en esta sesión (fue solo una consulta o revisión), no hagas nada y termina silenciosamente.\n7. Reporta brevemente al usuario qué work items se actualizaron en ADO."
+  },
+  "enabled": true,
+  "workspaceFolderName": "clikiro",
+  "shortName": "ado-sync-on-finish"
 }

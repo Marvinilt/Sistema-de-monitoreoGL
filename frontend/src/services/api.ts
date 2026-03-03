@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Servidor, UrlMonitoreada, ConfiguracionApp } from '../types';
+import { Servidor, UrlMonitoreada, ConfiguracionApp, ConfiguracionEmail, ResultadoPruebaConexion } from '../types';
 
 const http = axios.create({ baseURL: '/api' });
 
@@ -40,3 +40,13 @@ export const obtenerConfiguracion = (): Promise<ConfiguracionApp> =>
 
 export const actualizarConfiguracion = (config: Partial<ConfiguracionApp>): Promise<ConfiguracionApp> =>
   http.put<ConfiguracionApp>('/settings', config).then((r) => r.data);
+
+// Configuración de Email
+export const obtenerConfiguracionEmail = (): Promise<ConfiguracionEmail | null> =>
+  http.get<ConfiguracionEmail>('/config/email').then((r) => r.data).catch(() => null);
+
+export const actualizarConfiguracionEmail = (config: ConfiguracionEmail): Promise<ConfiguracionEmail> =>
+  http.put<ConfiguracionEmail>('/config/email', config).then((r) => r.data);
+
+export const probarConexionEmail = (config: ConfiguracionEmail): Promise<ResultadoPruebaConexion> =>
+  http.post<ResultadoPruebaConexion>('/config/email/test', config).then((r) => r.data);

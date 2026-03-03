@@ -6,6 +6,7 @@ import {
   UrlMonitoreada,
   ConfiguracionApp,
   ConfiguracionCompleta,
+  ConfiguracionEmail,
   EstadoServidor,
 } from '../types';
 
@@ -150,6 +151,19 @@ export class ConfigStore {
     this.guardar();
   }
 
+  // --- Configuración de Email (Requisitos 1.2, 1.3, 1.4) ---
+
+  obtenerConfiguracionEmail(): ConfiguracionEmail | undefined {
+    return this.datos.email;
+  }
+
+  actualizarConfiguracionEmail(config: ConfiguracionEmail): ConfiguracionEmail {
+    validarDestinatarios(config.destinatarios);
+    this.datos.email = config;
+    this.guardar();
+    return this.datos.email;
+  }
+
   // --- Configuración ---
 
   obtenerConfiguracion(): ConfiguracionApp {
@@ -206,5 +220,32 @@ export function validarUrl(url: string): void {
       throw new Error('Protocolo inválido');
   } catch {
     throw new Error(`URL inválida: "${url}". Debe comenzar con http:// o https://`);
+  }
+}
+
+/**
+ * Valida que una cadena tenga formato de email RFC 5322 básico.
+ * Retorna true si es válido, false si no.
+ */
+export function validarEmail(email: string): boolean {
+  // Regex RFC 5322 simplificado — cubre la gran mayoría de casos reales
+  const RFC5322 = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return RFC5322.test(email.trim());
+}
+
+/**
+ * Valida la lista de destinatarios:
+ * - Debe tener al menos un elemento
+ * - Cada elemento debe tener formato de email válido
+ * Lanza Error descriptivo en caso de fallo.
+ */
+export function validarDestinatarios(destinatarios: string[]): void {
+  if (!destinatarios || destinatarios.length === 0) {
+    throw new Error('La lista de destinatarios no puede estar vacía');
+  }
+  for (const email of destinatarios) {
+    if (!validarEmail(email)) {
+      throw new Error(`Dirección de correo inválida: "${email}"`);
+    }
   }
 }

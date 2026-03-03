@@ -38,3 +38,18 @@ export interface ConfiguracionApp {
 export type EventoWebSocket =
   | { tipo: 'server-update'; datos: Servidor }
   | { tipo: 'check-progress'; datos: { servidorId: string; enProgreso: boolean } };
+
+export interface ConfiguracionEmail {
+  habilitado: boolean;
+  smtpHost: string;
+  smtpPuerto: number;
+  smtpUsuario: string;
+  smtpPassword: string;
+  remitente: string;
+  destinatarios: string[]; // mínimo 1 dirección válida
+}
+
+export interface ResultadoPruebaConexion {
+  ok: boolean;
+  mensaje: string;
+}

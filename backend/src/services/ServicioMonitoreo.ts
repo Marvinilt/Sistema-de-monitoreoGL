@@ -4,24 +4,37 @@ import { VerificadorHTTPS } from '../checkers/VerificadorHTTPS';
 import {
   ResultadoVerificacion,
   EstadoServidor,
+  Servidor,
   UrlMonitoreada,
   ResultadoUrlVerificacion,
 } from '../types';
 
 export type OnServerUpdate = (servidorId: string) => void;
 
+/** Interfaz mínima para desacoplar ServicioNotificaciones de ServicioMonitoreo */
+export interface IServicioNotificaciones {
+  procesarResultado(servidorAntes: Servidor, resultado: ResultadoVerificacion): Promise<void>;
+}
+
 export class ServicioMonitoreo {
   private verificadorPuertos = new VerificadorPuertos();
   private verificadorHTTPS = new VerificadorHTTPS();
   private onUpdate?: OnServerUpdate;
 
-  constructor(private store: ConfigStore, onUpdate?: OnServerUpdate) {
+  constructor(
+    private store: ConfigStore,
+    onUpdate?: OnServerUpdate,
+    private servicioNotificaciones?: IServicioNotificaciones
+  ) {
     this.onUpdate = onUpdate;
   }
 
   async verificarServidor(servidorId: string): Promise<ResultadoVerificacion> {
     const servidor = this.store.obtenerServidor(servidorId);
     if (!servidor) throw new Error(`Servidor "${servidorId}" no encontrado`);
+
+    // Capturar estado anterior antes de actualizar (Req 5.1)
+    const servidorAntes: Servidor = { ...servidor };
 
     const [puertos, urls] = await Promise.all([
       this.verificadorPuertos.verificarPuertos(servidor.host, servidor.puertos),
@@ -46,13 +59,24 @@ export class ServicioMonitoreo {
     this.store.actualizarEstadoServidor(servidorId, estadoGeneral, urlsActualizadas, puertos);
     this.onUpdate?.(servidorId);
 
-    return {
+    const resultado: ResultadoVerificacion = {
       servidorId,
       timestamp: new Date().toISOString(),
       puertos,
       urls,
       estadoGeneral,
     };
+
+    // Llamar a ServicioNotificaciones de forma asíncrona sin bloquear (Req 5.1, 5.3)
+    if (this.servicioNotificaciones) {
+      this.servicioNotificaciones
+        .procesarResultado(servidorAntes, resultado)
+        .catch((err) =>
+          console.error('[ServicioMonitoreo] Error en procesarResultado:', err)
+        );
+    }
+
+    return resultado;
   }
 
   async verificarTodos(): Promise<ResultadoVerificacion[]> {

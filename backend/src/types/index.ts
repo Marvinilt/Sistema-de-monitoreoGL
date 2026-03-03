@@ -52,9 +52,33 @@ export interface ConfiguracionApp {
   intervaloMonitoreoSegundos: number; // 30 - 3600
 }
 
+// Requisito 1.1, 1.8: Configuración de email con parámetros SMTP y lista de destinatarios
+export interface ConfiguracionEmail {
+  habilitado: boolean;
+  smtpHost: string;
+  smtpPuerto: number;
+  smtpUsuario: string;
+  smtpPassword: string;
+  remitente: string;
+  destinatarios: string[]; // mínimo 1 dirección válida RFC 5322
+}
+
+// Requisito 2.1-2.4: Representa una transición de estado de un recurso monitoreable
+export interface CambioEstado {
+  recursoId: string;
+  tipoRecurso: 'servidor' | 'puerto' | 'url';
+  nombreRecurso: string;
+  estadoAnterior: string;
+  estadoNuevo: string;
+  timestamp: string; // ISO 8601
+  servidorId: string;
+  servidorNombre: string;
+}
+
 export interface ConfiguracionCompleta {
   configuracion: ConfiguracionApp;
   servidores: Servidor[];
+  email?: ConfiguracionEmail; // opcional para retrocompatibilidad (Requisito 1.1, 1.8)
 }
 
 // Tipos para la API REST

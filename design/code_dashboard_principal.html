@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CyberMonitor - System Overview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "accent-neon": "#0bda5e",
+                        "alert-neon": "#fa6238",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#0a0e17",
+                        "panel-dark": "#161b26",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(22, 27, 38, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .neon-glow-green {
+            text-shadow: 0 0 10px rgba(11, 218, 94, 0.5);
+        }
+        .neon-border-primary {
+            box-shadow: 0 0 15px rgba(13, 89, 242, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden">
+<div class="flex h-screen w-full">
+<!-- Sidebar Navigation -->
+<aside class="w-64 flex-shrink-0 flex flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-panel-dark">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center neon-border-primary">
+<span class="material-symbols-outlined text-white">security</span>
+</div>
+<div>
+<h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">CyberMonitor</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-mono uppercase tracking-widest">v2.4.0-Alpha</p>
+</div>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary border border-primary/20" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">dns</span>
+<span class="font-medium">Servers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">mail_lock</span>
+<span class="font-medium">SMTP Config</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">terminal</span>
+<span class="font-medium">Logs</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50">
+<div class="size-10 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile avatar placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqXb2HzV7HYfoKxjZFbZKTAil6QRGYiGKc_7VPAV0IR5swT6_pMxGlCq06M9Tb7c-M5M9i_OHw1H2Z0SAcy-nKWeAfmSdU7P8zFqE_R0jjy8EqHC9tx6om2EVSTIWuEbTOkGjzt8PIENi5Mbs0tVaBe11GR0spD79xHUvbDBgYuxVWkQGSpERHpn8Tr5iiNmo1MuwE_Pnw1iOQq7kyVl9bHB-FqS8dxuJpGodKh_pGiu0dRKP9F2nTSDfhMrPxlziOEWxVIl0IvGQ"/>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="text-sm font-semibold truncate">Admin_Root</p>
+<p class="text-xs text-slate-500 truncate">System Overseer</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<!-- Header -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-8 flex items-center justify-between z-10">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-accent-neon animate-pulse shadow-[0_0_8px_rgba(11,218,94,0.8)]"></div>
+<h2 class="text-accent-neon font-black text-xs tracking-[0.2em] uppercase neon-glow-green">System Status: Operational</h2>
+</div>
+<span class="h-4 w-px bg-slate-300 dark:bg-slate-700"></span>
+<div class="text-slate-500 dark:text-slate-400 text-xs font-mono uppercase tracking-wider">Uptime: 45d 12h 04m</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative w-64 group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-lg pl-10 pr-4 py-1.5 text-sm focus:ring-1 focus:ring-primary placeholder:text-slate-500" placeholder="Search network nodes..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings_suggest</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="flex-1 overflow-y-auto p-8 space-y-8">
+<!-- Top Section: Titles & Quick Metrics -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h3 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Global Network Overview</h3>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Real-time server telemetry and latency monitoring across clusters.</p>
+</div>
+<div class="flex gap-4">
+<div class="glass-panel p-4 rounded-xl min-w-[140px] border-l-4 border-l-primary">
+<p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Servers</p>
+<p class="text-3xl font-black mt-1">11</p>
+</div>
+<div class="glass-panel p-4 rounded-xl min-w-[140px] border-l-4 border-l-accent-neon">
+<p class="text-xs font-bold text-slate-500 uppercase tracking-widest">OK Status</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-3xl font-black">4</span>
+<span class="text-accent-neon text-xs font-bold bg-accent-neon/10 px-1.5 py-0.5 rounded">+2%</span>
+</div>
+</div>
+<div class="glass-panel p-4 rounded-xl min-w-[140px] border-l-4 border-l-alert-neon">
+<p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Active Alerts</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-3xl font-black text-alert-neon">7</span>
+<span class="text-alert-neon text-xs font-bold bg-alert-neon/10 px-1.5 py-0.5 rounded">-5%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Charts Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Global Health Ring Chart Panel -->
+<div class="lg:col-span-1 glass-panel p-6 rounded-2xl flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-bold text-slate-400 uppercase text-xs tracking-widest">Health Distribution</h4>
+<span class="material-symbols-outlined text-slate-500 text-sm cursor-help">info</span>
+</div>
+<div class="relative flex-1 flex flex-col items-center justify-center">
+<!-- Ring Chart SVG Simulation -->
+<div class="relative w-48 h-48">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 100 100">
+<!-- Background Circle -->
+<circle class="text-slate-200 dark:text-slate-800" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-width="8"></circle>
+<!-- Progress Circle (88%) -->
+<circle class="text-primary" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="30.14" stroke-linecap="round" stroke-width="8"></circle>
+<!-- Alert Segment (remaining part) -->
+<circle class="text-alert-neon/50" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="240" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-4xl font-black text-slate-900 dark:text-white">88%</span>
+<span class="text-[10px] text-accent-neon font-bold uppercase tracking-widest">Operational</span>
+</div>
+</div>
+<div class="grid grid-cols-3 w-full mt-8 gap-4">
+<div class="text-center">
+<p class="text-[10px] uppercase text-slate-500 font-bold mb-1">Active</p>
+<div class="h-1 bg-primary rounded-full w-full"></div>
+</div>
+<div class="text-center">
+<p class="text-[10px] uppercase text-slate-500 font-bold mb-1">Standby</p>
+<div class="h-1 bg-slate-400 rounded-full w-full"></div>
+</div>
+<div class="text-center">
+<p class="text-[10px] uppercase text-slate-500 font-bold mb-1">Down</p>
+<div class="h-1 bg-alert-neon rounded-full w-full"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Latency & Ping Chart Panel -->
+<div class="lg:col-span-2 glass-panel p-6 rounded-2xl">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-bold text-slate-400 uppercase text-xs tracking-widest">System Ping/Latency (ms)</h4>
+<div class="flex items-baseline gap-2 mt-1">
+<p class="text-4xl font-black text-slate-900 dark:text-white">24<span class="text-xl font-normal text-slate-500 ml-1">ms</span></p>
+<span class="text-alert-neon text-xs font-bold">-4ms variance</span>
+</div>
+</div>
+<div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 p-1 rounded-lg">
+<button class="px-3 py-1 text-[10px] font-bold uppercase rounded bg-white dark:bg-panel-dark shadow-sm">60m</button>
+<button class="px-3 py-1 text-[10px] font-bold uppercase rounded text-slate-500">24h</button>
+<button class="px-3 py-1 text-[10px] font-bold uppercase rounded text-slate-500">7d</button>
+</div>
+</div>
+<!-- Latency Chart SVG -->
+<div class="h-[240px] w-full mt-4">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 1000 300">
+<defs>
+<lineargradient id="latencyGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="rgba(13, 89, 242, 0.4)"></stop>
+<stop offset="100%" stop-color="rgba(13, 89, 242, 0)"></stop>
+</lineargradient>
+</defs>
+<!-- Grid lines -->
+<line class="text-slate-200 dark:text-slate-800" stroke="currentColor" stroke-dasharray="4" stroke-width="1" x1="0" x2="1000" y1="75" y2="75"></line>
+<line class="text-slate-200 dark:text-slate-800" stroke="currentColor" stroke-dasharray="4" stroke-width="1" x1="0" x2="1000" y1="150" y2="150"></line>
+<line class="text-slate-200 dark:text-slate-800" stroke="currentColor" stroke-dasharray="4" stroke-width="1" x1="0" x2="1000" y1="225" y2="225"></line>
+<!-- Area chart path -->
+<path d="M0,200 Q100,180 200,210 T400,150 T600,180 T800,120 T1000,160 L1000,300 L0,300 Z" fill="url(#latencyGradient)"></path>
+<!-- Line chart path -->
+<path d="M0,200 Q100,180 200,210 T400,150 T600,180 T800,120 T1000,160" fill="none" stroke="#0d59f2" stroke-linecap="round" stroke-width="4"></path>
+<!-- Data points -->
+<circle class="animate-pulse" cx="400" cy="150" fill="#0d59f2" r="5"></circle>
+<circle cx="800" cy="120" fill="#0d59f2" r="5"></circle>
+</svg>
+<div class="flex justify-between mt-2 font-mono text-[10px] text-slate-500 uppercase tracking-tighter">
+<span>10:00</span>
+<span>10:15</span>
+<span>10:30</span>
+<span>10:45</span>
+<span>11:00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity / Server Logs Table Preview -->
+<div class="glass-panel rounded-2xl overflow-hidden">
+<div class="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white/40 dark:bg-panel-dark/40">
+<h4 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">history</span>
+                            Active Network Node Performance
+                        </h4>
+<button class="text-xs font-bold text-primary hover:underline">View All Logs</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 text-[11px] uppercase tracking-widest font-bold">
+<th class="px-6 py-4">Node Identity</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4">Uptime</th>
+<th class="px-6 py-4">Load</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-colors">
+<td class="px-6 py-4 font-mono text-xs">US-EAST-ALPHA-01</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-accent-neon/10 text-accent-neon uppercase">Healthy</span>
+</td>
+<td class="px-6 py-4 text-slate-500">142d 08h</td>
+<td class="px-6 py-4">
+<div class="w-24 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 45%"></div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-slate-400 hover:text-white">more_vert</button>
+</td>
+</tr>
+<tr class="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-colors">
+<td class="px-6 py-4 font-mono text-xs">EU-WEST-BETA-09</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-alert-neon/10 text-alert-neon uppercase">High Latency</span>
+</td>
+<td class="px-6 py-4 text-slate-500">12d 22h</td>
+<td class="px-6 py-4">
+<div class="w-24 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="bg-alert-neon h-full" style="width: 88%"></div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-slate-400 hover:text-white">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-colors">
+<td class="px-6 py-4 font-mono text-xs">ASIA-SE-GAMMA-04</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-500/10 text-slate-500 uppercase">Standby</span>
+</td>
+<td class="px-6 py-4 text-slate-500">0d 0h</td>
+<td class="px-6 py-4">
+<div class="w-24 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="bg-slate-500 h-full" style="width: 0%"></div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-slate-400 hover:text-white">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
