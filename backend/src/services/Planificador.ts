@@ -17,10 +17,20 @@ export class Planificador {
     validarIntervalo(intervaloSegundos);
     this.detener();
     this.timer = setInterval(() => {
-      this.servicio.verificarTodos().catch((err) =>
-        console.error('[Planificador] Error en verificación periódica:', err)
-      );
+      this.ejecutarCiclo();
     }, intervaloSegundos * 1000);
+  }
+
+  /**
+   * Ejecuta un ciclo de verificación capturando cualquier excepción,
+   * incluyendo las del ServicioNotificaciones, para no interrumpir el ciclo. (Req 5.2)
+   */
+  async ejecutarCiclo(): Promise<void> {
+    try {
+      await this.servicio.verificarTodos();
+    } catch (err) {
+      console.error('[Planificador] Error en verificación periódica:', err);
+    }
   }
 
   detener(): void {

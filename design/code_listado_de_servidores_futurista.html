@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LogicMonitor - Server Inventory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                        "success": "#10b981",
+                        "danger": "#ef4444",
+                        "warning": "#f59e0b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glow-success { box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .glow-danger { box-shadow: 0 0 15px rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(8px); }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col justify-between p-4">
+<div class="flex flex-col gap-8">
+<div class="flex items-center gap-3 px-2">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 overflow-hidden">
+<img alt="Logo" class="w-full h-full object-cover" data-alt="Abstract geometric logo for monitoring app" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCahMYA7DmeoKe_6I18XMBuH-OG27uGviQVQzTk3lMh_lfWozf1c7un-Moi5LelZ658jfNQxSojTwVgOqCZ6a6S4LKOPtpbVY5qlul1q9KRe4aiCfaBn1LSTg7Pn88N_H0Ruj5dBED_X3y8u2eZAo88BjswTCXNiKfVq2_rfXGUzwnfT1Z940K5q6XkX-5_HIoeM3DFrFT33EyHlHtQHiVJV8Jd9F0BcibBpQIy_Ae-xMHG2s3IuLSbjg8oBljob6ioZuaw2r8jGyg"/>
+</div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-base font-bold leading-none">LogicMonitor</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium">SysAdmin Console</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span class="text-sm font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border border-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">database</span>
+<span class="text-sm font-semibold">Servers</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">description</span>
+<span class="text-sm font-semibold">Logs</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">notifications</span>
+<span class="text-sm font-semibold">Alerts</span>
+<span class="ml-auto bg-danger text-white text-[10px] px-1.5 py-0.5 rounded-full">12</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="text-sm font-semibold">Settings</span>
+</a>
+</nav>
+</div>
+<div class="pt-4 border-t border-slate-200 dark:border-slate-800">
+<button class="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-danger/10 hover:text-danger transition-colors">
+<span class="material-symbols-outlined text-xl">logout</span>
+<span class="text-sm font-semibold">Logout</span>
+</button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto bg-background-light dark:bg-[#0b0f18] p-8">
+<header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+<div>
+<h2 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Server Monitoring</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Real-time status of your global infrastructure</p>
+</div>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-lg text-sm font-bold transition-all">
+<span class="material-symbols-outlined text-lg">sync</span>
+                Refresh Status
+            </button>
+</header>
+<!-- Add New Server Section -->
+<section class="mb-10 p-6 rounded-xl border border-slate-200 dark:border-slate-800 glass-panel">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">add_circle</span>
+                Register New Instance
+            </h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500">Server Name</label>
+<input class="w-full bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600" placeholder="e.g. Production_Node_01" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500">IP Address</label>
+<input class="w-full bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600" placeholder="192.168.1.1" type="text"/>
+</div>
+<div class="flex items-end">
+<button class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">add</span>
+                        Add Server
+                    </button>
+</div>
+</div>
+</section>
+<!-- Server Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Healthy Server Card -->
+<div class="glow-success glass-panel rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-success/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="text-xs font-bold text-success uppercase tracking-widest mb-1">Operational</span>
+<h4 class="text-lg font-bold text-slate-900 dark:text-white truncate">ServiciosGL Producción Lógica 01</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400 font-mono mt-1">10.0.42.115</p>
+</div>
+<div class="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-success">dns</span>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 py-4 border-y border-slate-200 dark:border-slate-800">
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 80</span>
+<div class="w-2 h-2 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+</div>
+<div class="flex flex-col items-center border-x border-slate-200 dark:border-slate-800">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 443</span>
+<div class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 22</span>
+<div class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-slate-700 border-2 border-slate-900 flex items-center justify-center text-[10px] font-bold">JD</div>
+<div class="w-6 h-6 rounded-full bg-primary border-2 border-slate-900 flex items-center justify-center text-[10px] font-bold">AM</div>
+</div>
+<button class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white rounded text-xs font-bold transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">bolt</span> Check
+                    </button>
+</div>
+</div>
+<!-- Alerting Server Card -->
+<div class="glow-danger glass-panel rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-danger/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="text-xs font-bold text-danger uppercase tracking-widest mb-1">Critical Alert</span>
+<h4 class="text-lg font-bold text-slate-900 dark:text-white truncate">ServiciosGL Producción Lógica 02</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400 font-mono mt-1">10.0.42.116</p>
+</div>
+<div class="w-10 h-10 rounded-lg bg-danger/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-danger">report</span>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 py-4 border-y border-slate-200 dark:border-slate-800">
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 80</span>
+<div class="w-2 h-2 rounded-full bg-danger animate-pulse shadow-[0_0_8px_rgba(239,68,68,1)]"></div>
+</div>
+<div class="flex flex-col items-center border-x border-slate-200 dark:border-slate-800">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 443</span>
+<div class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 3306</span>
+<div class="w-2 h-2 rounded-full bg-danger shadow-[0_0_8px_rgba(239,68,68,1)]"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-bold text-danger bg-danger/10 px-2 py-1 rounded">High Latency Detected</span>
+<button class="px-4 py-2 bg-danger text-white rounded text-xs font-bold transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">search</span> Investigate
+                    </button>
+</div>
+</div>
+<!-- Healthy Server Card -->
+<div class="glow-success glass-panel rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-success/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="text-xs font-bold text-success uppercase tracking-widest mb-1">Operational</span>
+<h4 class="text-lg font-bold text-slate-900 dark:text-white truncate">Database Main Cluster</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400 font-mono mt-1">10.0.42.201</p>
+</div>
+<div class="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-success">database</span>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 py-4 border-y border-slate-200 dark:border-slate-800">
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 5432</span>
+<div class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+</div>
+<div class="flex flex-col items-center border-x border-slate-200 dark:border-slate-800">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 6379</span>
+<div class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 22</span>
+<div class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-medium text-slate-500">Uptime: 142 days</span>
+<button class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white rounded text-xs font-bold transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">bolt</span> Check
+                    </button>
+</div>
+</div>
+<!-- Healthy Server Card -->
+<div class="glow-success glass-panel rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-success/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="text-xs font-bold text-success uppercase tracking-widest mb-1">Operational</span>
+<h4 class="text-lg font-bold text-slate-900 dark:text-white truncate">Auth-Gateway-Node-0</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400 font-mono mt-1">10.0.42.50</p>
+</div>
+<div class="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-success">lock</span>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 py-4 border-y border-slate-200 dark:border-slate-800">
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 443</span>
+<div class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+</div>
+<div class="flex flex-col items-center border-x border-slate-200 dark:border-slate-800">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 8443</span>
+<div class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 22</span>
+<div class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-success"></div>
+<span class="text-xs text-slate-400">Stable</span>
+</div>
+<button class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white rounded text-xs font-bold transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">bolt</span> Check
+                    </button>
+</div>
+</div>
+<!-- Healthy Server Card -->
+<div class="glow-success glass-panel rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-success/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="text-xs font-bold text-success uppercase tracking-widest mb-1">Operational</span>
+<h4 class="text-lg font-bold text-slate-900 dark:text-white truncate">CDN Edge Cache (LDN)</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400 font-mono mt-1">185.192.1.44</p>
+</div>
+<div class="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-success">public</span>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 py-4 border-y border-slate-200 dark:border-slate-800">
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 80</span>
+<div class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+</div>
+<div class="flex flex-col items-center border-x border-slate-200 dark:border-slate-800">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 443</span>
+<div class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Port 8080</span>
+<div class="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-medium text-slate-500">Region: EU-West-1</span>
+<button class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white rounded text-xs font-bold transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">bolt</span> Check
+                    </button>
+</div>
+</div>
+<!-- New Empty Slot Placeholder -->
+<div class="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center p-8 opacity-50 hover:opacity-100 transition-opacity cursor-pointer">
+<span class="material-symbols-outlined text-4xl mb-2">add_circle</span>
+<p class="font-bold text-sm">Register Another Node</p>
+</div>
+</div>
+</main>
+</div>
+</body></html>

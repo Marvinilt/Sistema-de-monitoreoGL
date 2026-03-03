@@ -59,11 +59,23 @@ npm test
 | POST | `/api/monitor/check-all` | Verificar todos |
 | GET/PUT | `/api/settings` | Configuración de intervalo |
 
+| GET | `/api/config/email` | Obtener configuración de email (sin contraseña) |
+| PUT | `/api/config/email` | Actualizar configuración de email |
+| POST | `/api/config/email/test` | Probar conexión SMTP |
+
 ## WebSocket
 
 Conectar a `ws://localhost:3001/ws`. Eventos emitidos:
 - `server-update`: estado actualizado de un servidor
 - `check-progress`: indicador de verificación en progreso
 
+## Notificaciones por Email
+
+El sistema envía correos HTML automáticamente cuando detecta cambios de estado en servidores, puertos o URLs. Configurable desde el panel de ajustes.
+
+**Configuración requerida:** host SMTP, puerto, usuario, contraseña, remitente y al menos un destinatario válido.
+
+**Nota para entornos internos:** si el servidor SMTP solo es accesible por IP privada, usar la IP directa como `smtpHost` en lugar del hostname.
+
 ---
-*Actualizado: 2026-02-27*
+*Actualizado: 2026-03-03*

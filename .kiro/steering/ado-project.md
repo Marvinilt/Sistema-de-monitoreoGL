@@ -8,3 +8,5 @@ All Azure DevOps operations in this workspace must use the following project:
 - URL: https://dev.azure.com/devopsminfin/Munis-MonitorServers
 
 Always use `Munis-MonitorServers` as the project parameter in any ADO MCP tool call unless the user explicitly specifies a different project.
+
+Todo workitem creado en ADO, de cualquier tipo, tiene que ir asignado al miembro del equipo mlemus@minfin.gob.gt.

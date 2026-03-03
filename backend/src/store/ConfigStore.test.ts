@@ -161,3 +161,130 @@ test('Propiedad 10: Persistencia round-trip de configuración', () => {
     { numRuns: 100 }
   );
 });
+
+// ---------------------------------------------------------------------------
+// Tarea 2.2: Tests unitarios para configuración de email (Requisitos 1.2, 1.3, 1.4)
+// ---------------------------------------------------------------------------
+
+import { validarEmail, validarDestinatarios } from './ConfigStore';
+import { ConfiguracionEmail } from '../types';
+
+const emailValido: ConfiguracionEmail = {
+  habilitado: true,
+  smtpHost: 'smtp.example.com',
+  smtpPuerto: 587,
+  smtpUsuario: 'user@example.com',
+  smtpPassword: 'secret',
+  remitente: 'Monitor <monitor@example.com>',
+  destinatarios: ['admin@example.com', 'ops@example.com'],
+};
+
+describe('ConfigStore - configuración de email', () => {
+  test('guarda y recupera configuración de email válida', () => {
+    const store = crearStore();
+    const guardado = store.actualizarConfiguracionEmail(emailValido);
+    expect(guardado.smtpHost).toBe('smtp.example.com');
+    expect(guardado.destinatarios).toEqual(['admin@example.com', 'ops@example.com']);
+
+    const recuperado = store.obtenerConfiguracionEmail();
+    expect(recuperado).toBeDefined();
+    expect(recuperado!.smtpHost).toBe('smtp.example.com');
+  });
+
+  test('retorna undefined cuando no hay configuración de email (retrocompatibilidad)', () => {
+    const store = crearStore();
+    expect(store.obtenerConfiguracionEmail()).toBeUndefined();
+  });
+
+  test('lanza error si la lista de destinatarios está vacía', () => {
+    const store = crearStore();
+    expect(() =>
+      store.actualizarConfiguracionEmail({ ...emailValido, destinatarios: [] })
+    ).toThrow('no puede estar vacía');
+  });
+
+  test('lanza error si algún email tiene formato inválido', () => {
+    const store = crearStore();
+    expect(() =>
+      store.actualizarConfiguracionEmail({ ...emailValido, destinatarios: ['no-es-email'] })
+    ).toThrow('inválida');
+  });
+
+  test('persiste la configuración de email en disco (round-trip)', () => {
+    const file = testConfigFile();
+    const store1 = new ConfigStore(file);
+    store1.actualizarConfiguracionEmail(emailValido);
+
+    const store2 = new ConfigStore(file);
+    const recuperado = store2.obtenerConfiguracionEmail();
+    expect(recuperado).toBeDefined();
+    expect(recuperado!.destinatarios).toEqual(emailValido.destinatarios);
+  });
+});
+
+describe('validarEmail', () => {
+  test('acepta emails válidos', () => {
+    expect(validarEmail('user@example.com')).toBe(true);
+    expect(validarEmail('admin@sub.domain.org')).toBe(true);
+    expect(validarEmail('ops+tag@company.co')).toBe(true);
+  });
+
+  test('rechaza emails inválidos', () => {
+    expect(validarEmail('no-arroba')).toBe(false);
+    expect(validarEmail('@sin-local.com')).toBe(false);
+    expect(validarEmail('sin-dominio@')).toBe(false);
+    expect(validarEmail('')).toBe(false);
+    expect(validarEmail('espacios en medio@x.com')).toBe(false);
+  });
+});
+
+describe('validarDestinatarios', () => {
+  test('no lanza con lista válida', () => {
+    expect(() => validarDestinatarios(['a@b.com'])).not.toThrow();
+  });
+
+  test('lanza con lista vacía', () => {
+    expect(() => validarDestinatarios([])).toThrow();
+  });
+
+  test('lanza con email inválido en la lista', () => {
+    expect(() => validarDestinatarios(['ok@ok.com', 'malo'])).toThrow('malo');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Feature: email-notifications, Property 7: validación de emails rechaza formatos inválidos
+// Validates: Requirements 1.2, 1.4
+// ---------------------------------------------------------------------------
+describe('Property 7: Validación de destinatarios rechaza formatos inválidos', () => {
+  test('strings aleatorios sin formato email son rechazados por validarEmail', () => {
+    fc.assert(
+      fc.property(
+        // Genera strings que NO contienen '@' — garantizados inválidos
+        fc.string({ minLength: 1, maxLength: 50 }).filter((s) => !s.includes('@')),
+        (str) => {
+          return validarEmail(str) === false;
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
+  test('emails con formato local@dominio.tld son aceptados por validarEmail', () => {
+    fc.assert(
+      fc.property(
+        // Genera emails con estructura válida: local@sub.tld
+        fc.record({
+          local: fc.stringMatching(/^[a-z][a-z0-9]{1,10}$/),
+          dominio: fc.stringMatching(/^[a-z]{2,10}$/),
+          tld: fc.stringMatching(/^[a-z]{2,5}$/),
+        }),
+        ({ local, dominio, tld }) => {
+          const email = `${local}@${dominio}.${tld}`;
+          return validarEmail(email) === true;
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+});

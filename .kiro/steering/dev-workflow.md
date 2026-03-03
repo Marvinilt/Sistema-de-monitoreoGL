@@ -62,32 +62,29 @@ Cuando el usuario indique que terminó el desarrollo de un feature, se deben rea
 
 ## Sincronización con Azure DevOps durante el desarrollo
 
-### Al iniciar el desarrollo de un task de Kiro
+### Al iniciar el desarrollo de un task o subtask de Kiro
 
 Antes de escribir cualquier código, el agente DEBE:
 
-1. Leer el archivo `tasks.md` del spec activo para identificar el task a desarrollar
-2. Buscar en ADO (proyecto `Munis-MonitorServers`) el work item correspondiente al task por título o descripción
-3. Si el work item existe, actualizarlo a estado `Active`
-4. Si no existe, crearlo como `Task` bajo el Feature o User Story correspondiente y marcarlo como `Active`
-5. Recién después de completar la sincronización, iniciar el desarrollo
+1. Leer el archivo `tasks.md` del spec activo para identificar el subtask hijo a desarrollar.
+2. Buscar en ADO (proyecto `Munis-MonitorServers`) el ID del PBI asociado al subtask.
+3. Si el work item existe, actualizar el PBI a `En Progreso`
+4. Crear el subtask a desarrollar como nuevo item `Task` bajo el Product Backlog asociado, en el sprint actual, y marcarlo con estado `In Progress`.
+5. Asocia el id de este `Task` creado al subtask del spec en la sección `ado:` agregandolo como `task_id:{id}`, para poderlo encontrar al finalizar la tarea.
+6. Recién después de completar la sincronización, iniciar el desarrollo
 
 ### Al finalizar el desarrollo de un task de Kiro
 
 Cuando el agente complete exitosamente un task (código implementado, tests pasando), DEBE:
 
-1. Buscar en ADO el work item correspondiente al task completado
-2. Actualizarlo a estado `Done` o `Closed`
-3. Si existe un Pull Request asociado al feature, vincularlo al work item
-4. Buscar el Feature padre en ADO y verificar si todos sus PBIs/Tasks están Done — si es así, actualizar el Feature a `Done` también
-5. Reportar al usuario la sincronización realizada
-
-### Reglas de mapeo task → work item
-
-- El título del task en `tasks.md` se usa como criterio de búsqueda en ADO
-- Si hay ambigüedad (múltiples work items similares), preguntar al usuario cuál corresponde
-- Nunca crear duplicados: verificar existencia antes de crear
-- El proyecto ADO siempre es `Munis-MonitorServers`
+1. Buscar en ADO el ID del `Task` asociado y marca el item a estado `Done`
+2. Si no hay ningun ID de `Task` asociado es porque algo falló en las instrucciones de inicio de task, crea el subtask desarrollado como un nuevo item `Task` bajo el Product Backlog asociado, en el sprint actual, y marcarlo con estado `Done`.
+3. Buscar en ADO el ID del PBI asociado al task completado
+4. Busca si existen otros task pendientes de trabajar y que tengan el mismo ID de PBI asociado 
+5. Si no existen mas task pendientes con el ID del PBI, actualiza el item a estado `Done`
+6. Si existe un Pull Request asociado al feature, vincularlo al work item
+7. Buscar el Feature padre en ADO y verificar si todos sus PBIs/Tasks están Done — si es así, actualizar el Feature a `Done` también
+8. Reportar al usuario la sincronización realizada
 
 ## Convenciones generales
 

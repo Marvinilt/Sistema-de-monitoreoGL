@@ -1,4 +1,6 @@
 import { Router, Request, Response } from 'express';
+import * as nodemailer from 'nodemailer';
+import { lookup as dnsLookup } from 'dns';
 import { ConfigStore } from '../store/ConfigStore';
 import { ServicioMonitoreo } from '../services/ServicioMonitoreo';
 import { GestorWebSocket } from './websocket';
@@ -145,6 +147,65 @@ export function crearRouter(
       res.json(config);
     } catch (err) {
       res.status(400).json({ error: (err as Error).message });
+    }
+  });
+
+  // --- Configuración de Email ---
+
+  // GET /api/config/email — retorna config sin exponer smtpPassword (Req 1.2)
+  router.get('/config/email', (_req: Request, res: Response) => {
+    const config = store.obtenerConfiguracionEmail();
+    if (!config) {
+      res.json(null);
+      return;
+    }
+    // Omitir contraseña en texto plano (Req 1.2)
+    const { smtpPassword: _omit, ...configSinPassword } = config;
+    res.json({ ...configSinPassword, smtpPassword: '' });
+  });
+
+  // PUT /api/config/email — valida y persiste, HTTP 400 en error (Req 1.2, 1.3, 1.4)
+  router.put('/config/email', (req: Request, res: Response) => {
+    try {
+      const config = store.actualizarConfiguracionEmail(req.body);
+      const { smtpPassword: _omit, ...configSinPassword } = config;
+      res.json({ ...configSinPassword, smtpPassword: '' });
+    } catch (err) {
+      res.status(400).json({ error: (err as Error).message });
+    }
+  });
+
+  // POST /api/config/email/test — prueba conexión SMTP (Req 1.9, 1.10, 1.11)
+  // Acepta config en el body para probar sin necesidad de guardar primero
+  router.post('/config/email/test', async (req: Request, res: Response) => {
+    const config = (req.body && req.body.smtpHost) ? req.body : store.obtenerConfiguracionEmail();
+    if (!config) {
+      res.json({ ok: false, mensaje: 'No hay configuración de email guardada' });
+      return;
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: config.smtpHost,
+      port: config.smtpPuerto,
+      secure: false,
+      ignoreTLS: true,
+      tls: { rejectUnauthorized: false },
+      auth: config.smtpUsuario ? {
+        user: config.smtpUsuario,
+        pass: config.smtpPassword,
+      } : undefined,
+      connectionTimeout: 10_000,
+      greetingTimeout: 10_000,
+      socketTimeout: 10_000,
+      dnsLookup,
+    } as nodemailer.TransportOptions);
+
+    try {
+      await transporter.verify();
+      res.json({ ok: true, mensaje: 'Conexión SMTP exitosa' });
+    } catch (err) {
+      const mensaje = (err as Error).message ?? 'Error desconocido';
+      res.json({ ok: false, mensaje });
     }
   });
 
