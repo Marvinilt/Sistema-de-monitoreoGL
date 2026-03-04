@@ -37,14 +37,19 @@ export class ServicioNotificaciones {
     const config = this.store.obtenerConfiguracionEmail();
 
     // Omitir si no hay configuración o está deshabilitada (Req 4.7)
-    if (!config || !config.habilitado) return;
+    if (!config || !config.habilitado) {
+      console.log(`[ServicioNotificaciones] Omitido: habilitado=${config?.habilitado ?? 'sin config'} para servidor ${servidorAntes.nombre}`);
+      return;
+    }
 
     const cambios = this.detectarCambios(servidorAntes, resultado);
-
+    
     if (cambios.length === 0) return;
-
+    console.log(`[ServicioNotificaciones] Cambios detectados para ${servidorAntes.nombre}: ${cambios.length}`);
+    
     // Filtrar cambios ya notificados (Req 3.2, 3.3)
     const nuevos = cambios.filter((c) => !this.registro.yaNotificado(c));
+    console.log(`[ServicioNotificaciones] Cambios nuevos (no deduplicados): ${nuevos.length}`);
 
     if (nuevos.length === 0) return;
 

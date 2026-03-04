@@ -141,12 +141,14 @@ export class ServicioEmail {
 
     try {
       const transporter = this.crearTransporte(config);
+      console.log(`[ServicioEmail] Enviando a ${config.destinatarios.join(', ')} via ${config.smtpHost}:${config.smtpPuerto}`);
       await transporter.sendMail({
         from: config.remitente,
         to: config.destinatarios.join(', '),
         subject: asunto,
         html,
       });
+      console.log(`[ServicioEmail] Correo enviado: ${asunto}`);
     } catch (error) {
       // Req 4.5, 4.6: loguear sin relanzar
       console.error('[ServicioEmail] Error al enviar notificación:', error);
