@@ -1,0 +1,104 @@
+import React from 'react';
+import { StatusBadge } from '../common/StatusBadge';
+
+export interface PortStatus {
+    port: number;
+    status: 'open' | 'closed';
+    protocol: string;
+}
+
+export interface ServerCardProps {
+    id: string;
+    name: string;
+    host: string;
+    status: 'ok' | 'alert' | 'warning' | 'unknown';
+    ports?: PortStatus[];
+    onCheck: (id: string) => void;
+    onInvestigate: (id: string) => void;
+    onClick?: (id: string) => void;
+}
+
+export const ServerCard: React.FC<ServerCardProps> = ({
+    id,
+    name,
+    host,
+    status,
+    ports = [],
+    onCheck,
+    onInvestigate,
+    onClick,
+}) => {
+    const isAlert = status === 'alert';
+    const glowClass = isAlert ? 'glow-danger border-danger/50' : 'glow-success border-success/50';
+
+    return (
+        <div
+            className={`glass-panel p-6 rounded-xl flex flex-col gap-4 border ${glowClass} transition-all duration-300 hover:brightness-110 cursor-pointer`}
+            onClick={() => onClick && onClick(id)}
+            role="button"
+            tabIndex={onClick ? 0 : undefined}
+            onKeyDown={(e) => {
+                if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    onClick(id);
+                }
+            }}
+            aria-label={`Servidor ${name}, host ${host}, estado ${status}`}
+        >
+            <div className="flex justify-between items-start">
+                <div>
+                    <h3 className="text-xl font-bold text-gray-100 mb-1">{name}</h3>
+                    <p className="text-sm font-mono text-gray-400">{host}</p>
+                </div>
+                <StatusBadge status={status} />
+            </div>
+
+            <div className="bg-background-dark/50 rounded-lg p-3 mt-2 flex-grow">
+                <h4 className="text-xs uppercase tracking-wider text-gray-500 mb-2">Puertos ({ports.length})</h4>
+                <div className="flex flex-wrap gap-2">
+                    {ports.map((p) => {
+                        const isOpen = p.status === 'open';
+                        const ledClass = isOpen
+                            ? 'bg-accent-neon led-pulse shadow-[0_0_8px_theme(colors.accent-neon)]'
+                            : 'bg-danger shadow-[0_0_5px_theme(colors.danger)]';
+
+                        return (
+                            <div
+                                key={p.port}
+                                className="flex items-center gap-1.5 bg-panel-dark px-2 py-1 rounded text-xs font-mono"
+                                title={`${p.protocol.toUpperCase()} Port ${p.port} is ${p.status}`}
+                            >
+                                <span className={`w-2 h-2 rounded-full ${ledClass}`} aria-hidden="true" />
+                                <span className={isOpen ? 'text-gray-200' : 'text-gray-500'}>{p.port}</span>
+                            </div>
+                        );
+                    })}
+                    {ports.length === 0 && (
+                        <p className="text-xs text-gray-500 italic">No ports monitored</p>
+                    )}
+                </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-2 border-t border-gray-700/50 pt-4" onClick={e => e.stopPropagation()}>
+                <button
+                    onClick={() => onCheck(id)}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-panel-dark hover:bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-accent-neon"
+                    aria-label={`Verificar estado de ${name}`}
+                >
+                    <span className="material-symbols-outlined text-[18px]">refresh</span>
+                    Check
+                </button>
+                {isAlert && (
+                    <button
+                        onClick={() => onInvestigate(id)}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-danger/20 hover:bg-danger/30 text-danger-400 border border-danger/30 focus:outline-none focus:ring-2 focus:ring-danger"
+                        aria-label={`Investigar alerta en ${name}`}
+                    >
+                        <span className="material-symbols-outlined text-[18px]">warning</span>
+                        Investigate
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+};

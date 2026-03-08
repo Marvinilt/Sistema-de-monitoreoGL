@@ -2,6 +2,7 @@
 // Requisitos: 3.8, 3.9, 3.10, 3.11, 3.12, 11.1
 
 import { useState } from 'react';
+import { useTheme } from '../../hooks/useTheme';
 
 interface HeaderProps {
   systemStatus?: 'operational' | 'degraded' | 'down';
@@ -32,6 +33,7 @@ export function Header({
   onSearch,
 }: HeaderProps) {
   const [searchValue, setSearchValue] = useState('');
+  const { isDark, toggleTheme } = useTheme();
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
@@ -43,13 +45,12 @@ export function Header({
       {/* System status indicator */}
       <div className="flex items-center gap-2 flex-shrink-0">
         <span
-          className={`w-2.5 h-2.5 rounded-full led-pulse ${
-            systemStatus === 'operational'
+          className={`w-2.5 h-2.5 rounded-full led-pulse ${systemStatus === 'operational'
               ? 'bg-accent-neon'
               : systemStatus === 'degraded'
-              ? 'bg-warning'
-              : 'bg-danger'
-          }`}
+                ? 'bg-warning'
+                : 'bg-danger'
+            }`}
           aria-hidden="true"
         />
         <span className="text-sm text-gray-300 whitespace-nowrap">
@@ -83,6 +84,18 @@ export function Header({
       </div>
 
       <div className="flex items-center gap-1 ml-auto">
+        {/* Theme toggle button */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          <span className="material-symbols-outlined text-xl" aria-hidden="true">
+            {isDark ? 'light_mode' : 'dark_mode'}
+          </span>
+        </button>
+
         {/* Notifications button */}
         <button
           type="button"
