@@ -50,3 +50,7 @@ export const actualizarConfiguracionEmail = (config: ConfiguracionEmail): Promis
 
 export const probarConexionEmail = (config: ConfiguracionEmail): Promise<ResultadoPruebaConexion> =>
   http.post<ResultadoPruebaConexion>('/config/email/test', config).then((r) => r.data);
+
+// Logs
+export const obtenerNotificaciones = (): Promise<{ notificaciones: { claveDeduplicacion: string, timestamp: string }[] }> =>
+  http.get('/notifications').then((r) => r.data);

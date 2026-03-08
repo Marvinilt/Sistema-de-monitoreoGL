@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import * as nodemailer from 'nodemailer';
 import { lookup as dnsLookup } from 'dns';
+import * as path from 'path';
 import { ConfigStore } from '../store/ConfigStore';
 import { ServicioMonitoreo } from '../services/ServicioMonitoreo';
 import { GestorWebSocket } from './websocket';
@@ -206,6 +207,20 @@ export function crearRouter(
     } catch (err) {
       const mensaje = (err as Error).message ?? 'Error desconocido';
       res.json({ ok: false, mensaje });
+    }
+  });
+
+  // --- Registro de Notificaciones / Logs ---
+  router.get('/notifications', (_req: Request, res: Response) => {
+    try {
+      const dbPath = path.join(__dirname, '../../data/notifications.json');
+      if (require('fs').existsSync(dbPath)) {
+        res.json(JSON.parse(require('fs').readFileSync(dbPath, 'utf8')));
+      } else {
+        res.json({ notificaciones: [] });
+      }
+    } catch (e) {
+      res.status(500).json({ error: (e as Error).message });
     }
   });
 

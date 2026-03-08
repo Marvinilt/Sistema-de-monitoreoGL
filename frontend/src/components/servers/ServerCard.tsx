@@ -82,7 +82,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({
                         );
                     })}
                     {ports.length === 0 && (
-                        <p className="text-xs text-gray-500 italic">No ports monitored</p>
+                        <p className="text-xs text-gray-500 italic">Sin puertos configurados</p>
                     )}
                 </div>
 
@@ -118,7 +118,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({
                     aria-label={`Verificar estado de ${name}`}
                 >
                     <span className="material-symbols-outlined text-[18px]">refresh</span>
-                    Check
+                    Actualizar
                 </button>
                 {isAlert && (
                     <button
@@ -127,7 +127,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({
                         aria-label={`Investigar alerta en ${name}`}
                     >
                         <span className="material-symbols-outlined text-[18px]">warning</span>
-                        Investigate
+                        Investigar
                     </button>
                 )}
             </div>

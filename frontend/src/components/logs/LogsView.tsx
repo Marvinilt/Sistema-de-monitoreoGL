@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { obtenerNotificaciones } from '../../services/api';
+import { useServers } from '../../hooks/useServers';
 
 export type LogType = 'info' | 'warning' | 'error' | 'success';
 
@@ -10,17 +12,64 @@ export interface LogEntry {
     message: string;
 }
 
-const MOCK_LOGS: LogEntry[] = [
-    { id: '1', timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(), type: 'error', source: 'Web Server Alpha', message: 'Connection timeout on port 80.' },
-    { id: '2', timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), type: 'warning', source: 'Cache Layer', message: 'High memory usage (85%).' },
-    { id: '3', timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(), type: 'success', source: 'Database Prod', message: 'Backup completed successfully.' },
-    { id: '4', timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(), type: 'info', source: 'System', message: 'Scheduled maintenance started.' },
-    { id: '5', timestamp: new Date(Date.now() - 1000 * 60 * 125).toISOString(), type: 'info', source: 'System', message: 'System boot completed.' },
-];
-
 export const LogsView: React.FC = () => {
-    // En la implementación real estos logs vendrían de useMonitor o un hook similar
-    const [logs] = useState<LogEntry[]>(MOCK_LOGS);
+    const { servidores } = useServers();
+    const [logs, setLogs] = useState<LogEntry[]>([]);
+
+    useEffect(() => {
+        obtenerNotificaciones()
+            .then(data => {
+                const parsed: LogEntry[] = data.notificaciones.map((n, i) => {
+                    const parts = n.claveDeduplicacion.split(':');
+                    const serverId = parts[0];
+                    const serverInfo = servidores.find(s => s.id === serverId);
+                    const sourceName = serverInfo ? serverInfo.nombre : serverId;
+
+                    let type: LogType = 'info';
+                    let message = '';
+
+                    if (parts[1] === 'puerto' || parts[1] === 'url') {
+                        const isPort = parts[1] === 'puerto';
+                        const subId = parts[2];
+                        const oldS = parts[3];
+                        const newS = parts[4];
+
+                        // Si es url, intentemos buscar la url real en el state
+                        let finalSubId = subId;
+                        if (!isPort && serverInfo) {
+                            const matchUrl = serverInfo.urls.find(u => u.id === subId);
+                            if (matchUrl) finalSubId = matchUrl.url.replace(/^https?:\/\//, '');
+                        }
+
+                        const label = isPort ? `Puerto ${finalSubId}` : `Sitio Web (${finalSubId})`;
+                        message = `${label} cambió de ${formatEstado(oldS)} a ${formatEstado(newS)}.`;
+
+                        if (newS === 'abierto' || newS === 'disponible') type = 'success';
+                        else if (newS === 'sin_respuesta' || newS === 'no_disponible') type = 'error';
+                        else type = 'warning';
+                    } else {
+                        const oldS = parts[1];
+                        const newS = parts[2];
+                        message = `Estado global alterado de ${formatEstado(oldS)} a ${formatEstado(newS)}.`;
+                        if (newS === 'ok') type = 'success';
+                        else if (newS === 'alerta') type = 'error';
+                        else type = 'warning';
+                    }
+
+                    return {
+                        id: `${i}-${n.timestamp}`,
+                        timestamp: n.timestamp,
+                        type,
+                        source: sourceName,
+                        message,
+                    };
+                });
+                setLogs(parsed);
+            })
+            .catch(err => console.error('Error fetching logs', err));
+    }, [servidores]);
+
+    const formatEstado = (est: string) => est.replace(/_/g, ' ').toUpperCase();
 
     // Property to maintain: chronologically descending order (newest first)
     const sortedLogs = [...logs].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
@@ -63,7 +112,7 @@ export const LogsView: React.FC = () => {
                 aria-live="polite"
             >
                 <div className="grid grid-cols-12 gap-4 p-4 border-b border-gray-700/80 bg-background-dark/50 text-xs uppercase tracking-wider text-gray-400 font-bold">
-                    <div className="col-span-3">Timestamp</div>
+                    <div className="col-span-3">Fecha y Hora</div>
                     <div className="col-span-2">Tipo</div>
                     <div className="col-span-3">Origen</div>
                     <div className="col-span-4">Descripción</div>

@@ -44,11 +44,11 @@ export function NodeTable({ nodes, onAction }: NodeTableProps) {
     <div className="glass-panel rounded-lg overflow-hidden" role="table" aria-label="Tabla de nodos monitoreados">
       <div role="rowgroup">
         <div role="row" className="grid grid-cols-5 px-4 py-2 text-xs text-gray-400 uppercase tracking-wider border-b border-white/5">
-          <span role="columnheader">Node Identity</span>
-          <span role="columnheader">Status</span>
-          <span role="columnheader">Uptime</span>
-          <span role="columnheader">Load</span>
-          <span role="columnheader">Actions</span>
+          <span role="columnheader">Identidad del Nodo</span>
+          <span role="columnheader">Estado</span>
+          <span role="columnheader">Tiempo Activo</span>
+          <span role="columnheader">Carga</span>
+          <span role="columnheader">Acciones</span>
         </div>
       </div>
       <div role="rowgroup">
@@ -83,10 +83,10 @@ export function NodeTable({ nodes, onAction }: NodeTableProps) {
               <span role="cell">
                 <button
                   onClick={() => onAction(node.id)}
-                  className="px-3 py-1 text-xs font-mono rounded border border-primary text-primary hover:bg-primary hover:text-white transition-colors"
+                  className="px-3 py-1 text-xs font-mono rounded border border-primary text-primary hover:bg-primary hover:text-white transition-colors cursor-pointer"
                   aria-label={`Acción para ${node.name}`}
                 >
-                  {node.status === 'alert' ? 'Investigate' : 'Check'}
+                  Actualizar
                 </button>
               </span>
             </div>
