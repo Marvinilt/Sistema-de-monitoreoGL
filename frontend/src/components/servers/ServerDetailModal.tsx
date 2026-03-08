@@ -11,6 +11,7 @@ export interface ServerDetailModalProps {
     onRemovePort: (id: string, port: number) => Promise<void>;
     onAddUrl: (id: string, url: string) => Promise<void>;
     onRemoveUrl: (id: string, urlId: string) => Promise<void>;
+    onRename: (id: string, nombre: string) => Promise<void>;
 }
 
 export const ServerDetailModal: React.FC<ServerDetailModalProps> = ({
@@ -21,29 +22,42 @@ export const ServerDetailModal: React.FC<ServerDetailModalProps> = ({
     onAddPort,
     onRemovePort,
     onAddUrl,
-    onRemoveUrl
+    onRemoveUrl,
+    onRename,
 }) => {
     const modalRef = useRef<HTMLDivElement>(null);
+    const nameInputRef = useRef<HTMLInputElement>(null);
     const [newPort, setNewPort] = useState('');
     const [newUrl, setNewUrl] = useState('');
+    const [editingName, setEditingName] = useState(false);
+    const [nameValue, setNameValue] = useState('');
 
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') onClose();
+            if (e.key === 'Escape') {
+                if (editingName) setEditingName(false);
+                else onClose();
+            }
         };
 
         if (isOpen) {
             document.addEventListener('keydown', handleEscape);
             modalRef.current?.focus();
+            setNameValue(server?.nombre ?? '');
+            setEditingName(false);
         } else {
-            // Reset state on close
             setNewPort('');
             setNewUrl('');
+            setEditingName(false);
         }
         return () => {
             document.removeEventListener('keydown', handleEscape);
         };
-    }, [isOpen, onClose]);
+    }, [isOpen, onClose, server?.nombre]);
+
+    useEffect(() => {
+        if (editingName) nameInputRef.current?.select();
+    }, [editingName]);
 
     if (!isOpen || !server) return null;
 
@@ -52,7 +66,7 @@ export const ServerDetailModal: React.FC<ServerDetailModalProps> = ({
         const p = Number(newPort);
         if (p > 0 && p <= 65535) {
             await onAddPort(server.id, p);
-            setNewPort(''); // clear
+            setNewPort('');
         }
     };
 
@@ -60,8 +74,16 @@ export const ServerDetailModal: React.FC<ServerDetailModalProps> = ({
         e.preventDefault();
         if (newUrl.trim()) {
             await onAddUrl(server.id, newUrl.trim());
-            setNewUrl(''); // clear
+            setNewUrl('');
         }
+    };
+
+    const handleConfirmName = async () => {
+        const trimmed = nameValue.trim();
+        if (trimmed && trimmed !== server.nombre) {
+            await onRename(server.id, trimmed);
+        }
+        setEditingName(false);
     };
 
     const isChecking = server.estado === 'desconocido';
@@ -76,14 +98,40 @@ export const ServerDetailModal: React.FC<ServerDetailModalProps> = ({
                 tabIndex={-1}
                 className="glass-panel w-full max-w-2xl rounded-2xl shadow-2xl shadow-accent-neon/5 border border-gray-700 outline-none flex flex-col max-h-[90vh] animate-slide-up"
             >
-                <div className="flex justify-between items-center p-6 border-b border-gray-700/50">
-                    <h2 id="modal-title" className="text-2xl font-bold flex flex-col">
-                        <span className="text-gray-100">{server.nombre}</span>
-                        <span className="text-sm font-mono text-gray-400 font-normal">{server.host}</span>
-                    </h2>
+                <div className="flex justify-between items-start p-6 border-b border-gray-700/50 gap-4">
+                    <div className="flex-1 min-w-0">
+                        {editingName ? (
+                            <input
+                                ref={nameInputRef}
+                                id="modal-title"
+                                value={nameValue}
+                                onChange={(e) => setNameValue(e.target.value)}
+                                onBlur={handleConfirmName}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleConfirmName();
+                                    if (e.key === 'Escape') setEditingName(false);
+                                }}
+                                className="w-full text-xl font-bold text-gray-100 bg-white/5 border border-accent-neon/50 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-accent-neon"
+                                aria-label="Nombre del servidor"
+                            />
+                        ) : (
+                            <button
+                                id="modal-title"
+                                onClick={() => setEditingName(true)}
+                                title="Clic para editar el nombre"
+                                className="group flex items-center gap-2 text-left w-full"
+                            >
+                                <span className="text-xl font-bold text-gray-100 truncate">{server.nombre}</span>
+                                <span className="material-symbols-outlined text-[16px] text-gray-500 group-hover:text-accent-neon transition-colors flex-shrink-0">
+                                    edit
+                                </span>
+                            </button>
+                        )}
+                        <span className="text-sm font-mono text-gray-400">{server.host}</span>
+                    </div>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-accent-neon rounded"
+                        className="text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-accent-neon rounded flex-shrink-0"
                         aria-label="Cerrar modal"
                     >
                         <span className="material-symbols-outlined text-[28px]">close</span>

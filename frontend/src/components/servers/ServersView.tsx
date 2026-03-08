@@ -7,7 +7,7 @@ import { useMonitor } from '../../hooks/useMonitor';
 import { Servidor } from '../../types';
 
 export const ServersView: React.FC = () => {
-    const { servidores, agregarServidor, actualizarServidor, agregarPuerto, agregarUrl, eliminarPuerto, eliminarUrl } = useServers();
+    const { servidores, agregarServidor, actualizarServidor, renombrarServidor, agregarPuerto, agregarUrl, eliminarPuerto, eliminarUrl } = useServers();
     const [selectedServerId, setSelectedServerId] = useState<string | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -162,6 +162,7 @@ export const ServersView: React.FC = () => {
                 onRemovePort={eliminarPuerto}
                 onAddUrl={agregarUrl}
                 onRemoveUrl={eliminarUrl}
+                onRename={renombrarServidor}
             />
 
             <AddServerModal

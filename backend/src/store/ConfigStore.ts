@@ -102,6 +102,14 @@ export class ConfigStore {
     this.guardar();
   }
 
+  renombrarServidor(id: string, nombre: string): Servidor {
+    const servidor = this._getServidor(id);
+    if (!nombre.trim()) throw new Error('El nombre no puede estar vacío');
+    servidor.nombre = nombre.trim();
+    this.guardar();
+    return { ...servidor };
+  }
+
   // --- Puertos ---
 
   agregarPuerto(servidorId: string, puerto: number): void {

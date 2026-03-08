@@ -45,6 +45,21 @@ export function crearRouter(
     }
   });
 
+  // PATCH /api/servers/:id — renombrar servidor
+  router.patch('/servers/:id', (req: Request, res: Response) => {
+    try {
+      const { nombre } = req.body;
+      if (!nombre || !nombre.trim()) {
+        res.status(400).json({ error: 'nombre es requerido' });
+        return;
+      }
+      const servidor = store.renombrarServidor(req.params.id, nombre.trim());
+      res.json(servidor);
+    } catch (err) {
+      res.status(404).json({ error: (err as Error).message });
+    }
+  });
+
   // --- Puertos ---
 
   // POST /api/servers/:id/ports
