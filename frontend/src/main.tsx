@@ -1,10 +1,13 @@
+// Feature: frontend-redesign-futurista
+// Requisitos: 4.4
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Dashboard } from './components/Dashboard';
+import { AppRouter } from './router/AppRouter';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <Dashboard />
+    <AppRouter />
   </React.StrictMode>
 );

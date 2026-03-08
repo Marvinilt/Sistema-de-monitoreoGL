@@ -1,3 +1,41 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  /* Panel con efecto glassmorphism */
+  .glass-panel {
+    @apply bg-panel-dark bg-opacity-80 backdrop-blur-md border border-white border-opacity-10 rounded-xl;
+  }
+
+  /* Glow verde neón para elementos OK */
+  .neon-glow-green {
+    box-shadow: 0 0 8px #00ff88, 0 0 20px rgba(0, 255, 136, 0.3);
+  }
+
+  /* Glow verde para tarjetas con estado OK */
+  .glow-success {
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.2), 0 0 40px rgba(0, 255, 136, 0.1);
+  }
+
+  /* Glow rojo para tarjetas con estado de alerta */
+  .glow-danger {
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.2), 0 0 40px rgba(255, 51, 102, 0.1);
+  }
+
+  /* Indicador LED pulsante */
+  .led-pulse {
+    animation: led-pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes led-pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 4px #00ff88, 0 0 10px rgba(0, 255, 136, 0.5);
+  }
+  50% {
+    opacity: 0.6;
+    box-shadow: 0 0 2px #00ff88, 0 0 5px rgba(0, 255, 136, 0.3);
+  }
+}

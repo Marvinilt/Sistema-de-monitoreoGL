@@ -44,18 +44,18 @@ Frontend (React/Vite :3000)  ←→  Backend (Express :3001)
 
 ### Pruebas de propiedad implementadas
 
-| Propiedad | Descripción | Herramienta |
-|-----------|-------------|-------------|
-| 1 | Registro de servidor persiste y es recuperable | fast-check |
-| 2 | Eliminación de servidor es completa | fast-check |
-| 3 | Rechazo de servidores duplicados | fast-check |
-| 4 | Validación de puertos rechaza entradas inválidas | fast-check |
-| 5 | Validación de URLs rechaza entradas inválidas | manual |
-| 6 | Clasificación de estado HTTP es exhaustiva | fast-check |
-| 7 | Renderizado de tarjeta refleja estado | fast-check + RTL |
-| 8 | Conteo del resumen global es consistente | fast-check |
-| 9 | Validación del intervalo de monitoreo | fast-check |
-| 10 | Persistencia round-trip de configuración | fast-check |
+| Propiedad | Descripción                                      | Herramienta      |
+| --------- | ------------------------------------------------ | ---------------- |
+| 1         | Registro de servidor persiste y es recuperable   | fast-check       |
+| 2         | Eliminación de servidor es completa              | fast-check       |
+| 3         | Rechazo de servidores duplicados                 | fast-check       |
+| 4         | Validación de puertos rechaza entradas inválidas | fast-check       |
+| 5         | Validación de URLs rechaza entradas inválidas    | manual           |
+| 6         | Clasificación de estado HTTP es exhaustiva       | fast-check       |
+| 7         | Renderizado de tarjeta refleja estado            | fast-check + RTL |
+| 8         | Conteo del resumen global es consistente         | fast-check       |
+| 9         | Validación del intervalo de monitoreo            | fast-check       |
+| 10        | Persistencia round-trip de configuración         | fast-check       |
 
 ---
 
@@ -164,11 +164,11 @@ Frontend SettingsPanel → API REST
 
 ### Endpoints REST nuevos
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/api/config/email` | Retorna config sin exponer `smtpPassword` |
-| PUT | `/api/config/email` | Valida y persiste config; HTTP 400 si inválida |
-| POST | `/api/config/email/test` | Prueba conexión SMTP; acepta config en body |
+| Método | Ruta                     | Descripción                                    |
+| ------ | ------------------------ | ---------------------------------------------- |
+| GET    | `/api/config/email`      | Retorna config sin exponer `smtpPassword`      |
+| PUT    | `/api/config/email`      | Valida y persiste config; HTTP 400 si inválida |
+| POST   | `/api/config/email/test` | Prueba conexión SMTP; acepta config en body    |
 
 ### Cambios en componentes existentes
 
@@ -226,15 +226,15 @@ interface CambioEstado {
 
 ### Propiedades de corrección implementadas (fast-check)
 
-| Propiedad | Descripción |
-|-----------|-------------|
-| 1 | Deduplicación: `yaNotificado` retorna `true` para cambio ya registrado |
-| 2 | Round-trip: `registrar` → `yaNotificado` retorna `true` |
-| 3 | Cambios distintos no son deduplicados |
-| 4 | Detección correcta de cambios por tipo de recurso |
-| 5 | Sin cambio no genera notificación |
-| 6 | HTML del correo contiene información de cada cambio |
-| 7 | Validación de destinatarios rechaza formatos inválidos |
+| Propiedad | Descripción                                                            |
+| --------- | ---------------------------------------------------------------------- |
+| 1         | Deduplicación: `yaNotificado` retorna `true` para cambio ya registrado |
+| 2         | Round-trip: `registrar` → `yaNotificado` retorna `true`                |
+| 3         | Cambios distintos no son deduplicados                                  |
+| 4         | Detección correcta de cambios por tipo de recurso                      |
+| 5         | Sin cambio no genera notificación                                      |
+| 6         | HTML del correo contiene información de cada cambio                    |
+| 7         | Validación de destinatarios rechaza formatos inválidos                 |
 
 ### Notas de conectividad SMTP
 
