@@ -25,7 +25,7 @@ const SIMULATED_DATA: LatencyData = {
 
 export function Dashboard() {
   const { servidores, cargando, actualizarServidor } = useServers();
-  const { verificarServidor } = useMonitor(actualizarServidor);
+  const { verificarServidor, enProgreso } = useMonitor(actualizarServidor);
   const [activeFilter, setActiveFilter] = useState<TimeFilter>('60m');
 
   const totalServers = servidores.length;
@@ -33,16 +33,25 @@ export function Dashboard() {
   const alertServers = servidores.filter((s) => s.estado === 'alerta').length;
 
   const nodes: NodeRow[] = useMemo(() =>
-    servidores.map((s) => ({
-      id: s.id,
-      name: s.nombre,
-      status: s.estado === 'ok' ? 'ok' : s.estado === 'alerta' ? 'alert' : 'warning',
-      uptimeSeconds: s.ultimaVerificacion
-        ? Math.floor((Date.now() - new Date(s.creadoEn).getTime()) / 1000)
-        : 0,
-      loadPercent: Math.floor(Math.random() * 100),
-    })),
-    [servidores]
+    servidores.map((s) => {
+      const totalPuertos = s.resultadosPuertos.length;
+      const puertosAbiertos = s.resultadosPuertos.filter(p => p.estado === 'abierto').length;
+      // Calcula qué porcentaje de puertos monitoreados están accesibles (100% = todos OK)
+      const portLoad = totalPuertos > 0
+        ? Math.round(((totalPuertos - puertosAbiertos) / totalPuertos) * 100)
+        : 0;
+      return {
+        id: s.id,
+        name: s.nombre,
+        status: s.estado === 'ok' ? 'ok' : s.estado === 'alerta' ? 'alert' : 'warning',
+        uptimeSeconds: s.ultimaVerificacion
+          ? Math.floor((Date.now() - new Date(s.creadoEn).getTime()) / 1000)
+          : 0,
+        loadPercent: portLoad,
+        isChecking: enProgreso.has(s.id),
+      };
+    }),
+    [servidores, enProgreso]
   );
 
   if (cargando) {

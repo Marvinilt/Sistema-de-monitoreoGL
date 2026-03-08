@@ -1,25 +1,46 @@
 import axios, { AxiosError } from 'axios';
+import * as https from 'https';
 import { UrlMonitoreada, ResultadoUrlVerificacion, EstadoUrl } from '../types';
 
 const TIMEOUT_MS = 10000;
 
-// Feature: server-monitor, Property 6: Clasificación de estado HTTP es exhaustiva y correcta
+// Headers que simulan un navegador para evitar bloqueos 403 por bot-filtering
+const BROWSER_HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+  'Cache-Control': 'no-cache',
+};
+
+/**
+ * Feature: server-monitor, Property 6: Clasificación de estado HTTP es exhaustiva y correcta
+ *
+ * 401 y 403 se consideran DISPONIBLE porque el servidor está activo y respondiendo.
+ * Solo indica que el recurso requiere autenticación, no que esté caído.
+ */
 export function clasificarEstadoHttp(codigo: number): EstadoUrl {
   if (codigo >= 200 && codigo <= 399) return 'disponible';
+  if (codigo === 401 || codigo === 403) return 'disponible'; // Servidor activo, requiere auth
   return 'no_disponible';
 }
 
 export class VerificadorHTTPS {
   async verificarUrl(urlMon: UrlMonitoreada): Promise<ResultadoUrlVerificacion> {
     const inicio = Date.now();
+    const agente = new https.Agent({ rejectUnauthorized: true });
+
     try {
       const respuesta = await axios.get(urlMon.url, {
         timeout: TIMEOUT_MS,
         validateStatus: () => true, // No lanzar error por códigos HTTP
-        httpsAgent: new (require('https').Agent)({ rejectUnauthorized: true }),
+        httpsAgent: agente,
+        headers: BROWSER_HEADERS,
+        maxRedirects: 5,
       });
 
       const estado = clasificarEstadoHttp(respuesta.status);
+      console.log(`[VerificadorHTTPS] ${urlMon.url} → HTTP ${respuesta.status} → ${estado}`);
       return {
         urlId: urlMon.id,
         url: urlMon.url,

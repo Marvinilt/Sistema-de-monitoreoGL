@@ -11,6 +11,8 @@ export interface NodeRow {
   status: NodeStatus;
   uptimeSeconds: number;
   loadPercent: number;
+  /** true mientras el backend está verificando este nodo */
+  isChecking?: boolean;
 }
 
 interface NodeTableProps {
@@ -47,7 +49,7 @@ export function NodeTable({ nodes, onAction }: NodeTableProps) {
           <span role="columnheader">Identidad del Nodo</span>
           <span role="columnheader">Estado</span>
           <span role="columnheader">Tiempo Activo</span>
-          <span role="columnheader">Carga</span>
+          <span role="columnheader">Puertos con Falla</span>
           <span role="columnheader">Acciones</span>
         </div>
       </div>
@@ -74,7 +76,7 @@ export function NodeTable({ nodes, onAction }: NodeTableProps) {
                     <div
                       className={`h-full rounded-full transition-all ${getLoadColorClass(node.loadPercent)}`}
                       style={{ width: `${Math.min(node.loadPercent, 100)}%` }}
-                      aria-label={`Carga: ${node.loadPercent}%`}
+                      aria-label={`Puertos con falla: ${node.loadPercent}%`}
                     />
                   </div>
                   <span className="text-xs font-mono text-gray-400 w-8 text-right">{node.loadPercent}%</span>
@@ -82,11 +84,20 @@ export function NodeTable({ nodes, onAction }: NodeTableProps) {
               </span>
               <span role="cell">
                 <button
-                  onClick={() => onAction(node.id)}
-                  className="px-3 py-1 text-xs font-mono rounded border border-primary text-primary hover:bg-primary hover:text-white transition-colors cursor-pointer"
-                  aria-label={`Acción para ${node.name}`}
+                  onClick={() => !node.isChecking && onAction(node.id)}
+                  disabled={node.isChecking}
+                  className={`px-3 py-1 text-xs font-mono rounded border transition-colors ${node.isChecking
+                      ? 'border-gray-600 text-gray-500 cursor-not-allowed opacity-60'
+                      : 'border-primary text-primary hover:bg-primary hover:text-white cursor-pointer'
+                    }`}
+                  aria-label={`Actualizar ${node.name}`}
                 >
-                  Actualizar
+                  {node.isChecking ? (
+                    <span className="flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px] animate-spin">autorenew</span>
+                      Verificando…
+                    </span>
+                  ) : 'Actualizar'}
                 </button>
               </span>
             </div>

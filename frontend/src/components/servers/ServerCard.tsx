@@ -21,7 +21,6 @@ export interface ServerCardProps {
     ports?: PortStatus[];
     urls?: UrlStatus[];
     onCheck: (id: string) => void;
-    onInvestigate: (id: string) => void;
     onClick?: (id: string) => void;
 }
 
@@ -33,7 +32,6 @@ export const ServerCard: React.FC<ServerCardProps> = ({
     ports = [],
     urls = [],
     onCheck,
-    onInvestigate,
     onClick,
 }) => {
     const isAlert = status === 'alert';
@@ -111,7 +109,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({
                 )}
             </div>
 
-            <div className="flex justify-end gap-3 mt-2 border-t border-gray-700/50 pt-4" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-end mt-2 border-t border-gray-700/50 pt-4" onClick={e => e.stopPropagation()}>
                 <button
                     onClick={() => onCheck(id)}
                     className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-panel-dark hover:bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-accent-neon"
@@ -120,16 +118,6 @@ export const ServerCard: React.FC<ServerCardProps> = ({
                     <span className="material-symbols-outlined text-[18px]">refresh</span>
                     Actualizar
                 </button>
-                {isAlert && (
-                    <button
-                        onClick={() => onInvestigate(id)}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-danger/20 hover:bg-danger/30 text-danger-400 border border-danger/30 focus:outline-none focus:ring-2 focus:ring-danger"
-                        aria-label={`Investigar alerta en ${name}`}
-                    >
-                        <span className="material-symbols-outlined text-[18px]">warning</span>
-                        Investigar
-                    </button>
-                )}
             </div>
         </div>
     );

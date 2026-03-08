@@ -17,9 +17,6 @@ export const ServersView: React.FC = () => {
         await verificarServidor(id);
     };
 
-    const handleInvestigate = (id: string) => {
-        setSelectedServerId(id);
-    };
 
     const handleAddServer = async (data: AddServerData) => {
         try {
@@ -69,7 +66,6 @@ export const ServersView: React.FC = () => {
                 status: u.estado
             })),
             onCheck: handleCheck,
-            onInvestigate: handleInvestigate,
             onClick: setSelectedServerId
         };
     };
