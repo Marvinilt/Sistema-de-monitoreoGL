@@ -7,7 +7,7 @@ import { useMonitor } from '../../hooks/useMonitor';
 import { Servidor } from '../../types';
 
 export const ServersView: React.FC = () => {
-    const { servidores, agregarServidor, actualizarServidor, agregarPuerto, agregarUrl } = useServers();
+    const { servidores, agregarServidor, actualizarServidor, agregarPuerto, agregarUrl, eliminarPuerto, eliminarUrl } = useServers();
     const [selectedServerId, setSelectedServerId] = useState<string | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -63,6 +63,11 @@ export const ServersView: React.FC = () => {
                 status: rp.estado === 'abierto' ? 'open' : 'closed',
                 protocol: 'tcp' // Simplification
             })),
+            urls: s.urls.map(u => ({
+                id: u.id,
+                url: u.url,
+                status: u.estado
+            })),
             onCheck: handleCheck,
             onInvestigate: handleInvestigate,
             onClick: setSelectedServerId
@@ -71,7 +76,6 @@ export const ServersView: React.FC = () => {
 
     const mappedServers = servidores.map(mapServerToProps);
     const selectedServer = servidores.find(s => s.id === selectedServerId) || null;
-    const selectedServerMapped = selectedServer ? mapServerToProps(selectedServer) : null;
 
     return (
         <div className="flex flex-col gap-6 p-6 pb-20 max-w-7xl mx-auto">
@@ -155,9 +159,13 @@ export const ServersView: React.FC = () => {
 
             <ServerDetailModal
                 isOpen={!!selectedServerId}
-                server={selectedServerMapped}
+                server={selectedServer}
                 onClose={() => setSelectedServerId(null)}
                 onCheck={handleCheck}
+                onAddPort={agregarPuerto}
+                onRemovePort={eliminarPuerto}
+                onAddUrl={agregarUrl}
+                onRemoveUrl={eliminarUrl}
             />
 
             <AddServerModal

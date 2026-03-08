@@ -7,12 +7,19 @@ export interface PortStatus {
     protocol: string;
 }
 
+export interface UrlStatus {
+    id: string;
+    url: string;
+    status: 'disponible' | 'no_disponible' | 'error_certificado' | 'desconocido';
+}
+
 export interface ServerCardProps {
     id: string;
     name: string;
     host: string;
     status: 'ok' | 'alert' | 'warning' | 'unknown';
     ports?: PortStatus[];
+    urls?: UrlStatus[];
     onCheck: (id: string) => void;
     onInvestigate: (id: string) => void;
     onClick?: (id: string) => void;
@@ -24,6 +31,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({
     host,
     status,
     ports = [],
+    urls = [],
     onCheck,
     onInvestigate,
     onClick,
@@ -77,6 +85,30 @@ export const ServerCard: React.FC<ServerCardProps> = ({
                         <p className="text-xs text-gray-500 italic">No ports monitored</p>
                     )}
                 </div>
+
+                {urls.length > 0 && (
+                    <div className="mt-3">
+                        <h4 className="text-xs uppercase tracking-wider text-gray-500 mb-2">URLs ({urls.length})</h4>
+                        <div className="flex flex-col gap-1.5">
+                            {urls.map((u) => {
+                                const isUp = u.status === 'disponible';
+                                const ledColor = isUp ? 'bg-success shadow-[0_0_8px_theme(colors.success)]'
+                                    : u.status === 'error_certificado' ? 'bg-warning shadow-[0_0_5px_theme(colors.warning)]'
+                                        : u.status === 'desconocido' ? 'bg-gray-500'
+                                            : 'bg-danger shadow-[0_0_5px_theme(colors.danger)]';
+
+                                return (
+                                    <div key={u.id} className="flex items-center gap-2 bg-panel-dark px-2 py-1 rounded text-xs font-mono overflow-hidden" title={`URL Status: ${u.status}`}>
+                                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ledColor}`} aria-hidden="true" />
+                                        <span className={`truncate ${isUp ? 'text-gray-200' : 'text-gray-400'}`}>
+                                            {u.url.replace(/^https?:\/\//, '')}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="flex justify-end gap-3 mt-2 border-t border-gray-700/50 pt-4" onClick={e => e.stopPropagation()}>
