@@ -241,3 +241,32 @@ interface CambioEstado {
 - El transporter usa `dns.lookup` (respeta `/etc/hosts` y `C:\Windows\System32\drivers\etc\hosts`)
 - Para servidores SMTP internos accesibles solo por IP, usar la IP directa como `smtpHost`
 - `ignoreTLS: true` + `tls: { rejectUnauthorized: false }` para relay interno sin TLS estricto
+
+---
+
+## Feature: Rediseño UI Futurista (servers-view-components)
+
+**Fecha:** 2026-03-08
+
+### Descripción
+
+Rediseño completo de la interfaz de usuario bajo una temática "Cyber-Dark" futurista. Reemplazo íntegro de la vista de servidores, dashboard principal, configuración SMTP y registros, manteniendo interoperabilidad total con la base lógica (`useServers`, `useMonitor`, `api`). 
+
+### Cambios visuales principales (Frontend)
+
+- **Layout y Sidebar:** Se implementó un layout principal con Sidebar colapsable animado y pestaña flotante discreta al borde derecho, maximizando el espacio para el dashboard. 
+- **Tarjetas de Servidores (`ServerCard`):** Ahora usan un estilo de paneles de cristal (glassmorphism) con efectos `glow-success` (OK) y `glow-danger` (Alert). Indicadores LED (CSS `box-shadow`) reemplazan el texto plano para el estado de puertos y URLs.
+- **Modal de Detalle (`ServerDetailModal`):** Rediseñado con fondos desenfocados, cuenta con edición *inline* directamente sobre el nombre del servidor (clic activa el input). 
+- **Tablero Principal (`Dashboard`):** Muestra el conteo en tiempo real calculando el porcentaje de la columna "Puertos con Falla". El botón Actualizar integra un feedback visual bloqueante (spinner animado `isChecking`) si el servidor se encuentra en un ciclo de verificación activo.
+- **Registros (`LogsView`):** Nueva vista de tabla responsiva con asignación de colores severidad-based recuperando los datos directamente del archivo de notificaciones del backend.
+
+### Cambios en Backend (API & Lógica)
+
+- **`PATCH /api/servers/:id`:** Nuevo endpoint para renombrar el servidor sin requerir re-crearlo. Controlado vía `store.renombrarServidor(id, nombre)`.
+- **Mitigación Error 403 (URLs Públicas):** El componente `VerificadorHTTPS.ts` inyecta Headers propios de Mozilla/Chrome (User-Agent, Accept) para prevenir bloqueos de Firewalls hacia solicitudes de bibliotecas genéricas HTTP (axios). 
+- **Tolerancia a Códigos 401/403:** Se integró la lógica a `clasificarEstadoHttp()` para categorizar estos códigos como `disponible`, asimilando que existe un aplicativo corriendo (sano) pero requiere provisión de autenticación.
+- **Estado Dinámico según URLs:** El `ServicioMonitoreo.ts` ahora prioriza la disponibilidad HTTPS: si TODAS las URLs asignadas responden `disponible`, ignora los fallos en puertos internos TCP (Network/VLAN unreachability) y clasifica al servidor padre como `ok`. 
+
+### Traducción de UI
+
+- Toda etiqueta y label visible a lo largo de las vistas públicas pasó por una etapa de Localización (l10n), garantizando que botones, tablas de datos y estados de la UI se muestren completamente en Español natural (`Tablero`, `Configuración SMTP`, `Verificando…`).

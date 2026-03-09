@@ -5,7 +5,7 @@ Aplicación web full-stack para monitorear en tiempo real el estado de puertos T
 ## Stack
 
 - **Backend**: Node.js + Express + TypeScript, WebSocket (`ws`)
-- **Frontend**: React + TypeScript + Tailwind CSS + Vite
+- **Frontend**: React + TypeScript + Tailwind CSS + Vite (UI Cyber-Dark Futurista)
 - **Persistencia**: JSON local (`backend/data/config.json`)
 - **Testing**: Jest + fast-check (backend), Vitest + React Testing Library (frontend)
 
@@ -46,18 +46,18 @@ npm test
 
 ## API REST
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/api/servers` | Listar servidores |
-| POST | `/api/servers` | Agregar servidor |
-| DELETE | `/api/servers/:id` | Eliminar servidor |
-| POST | `/api/servers/:id/ports` | Agregar puerto |
-| DELETE | `/api/servers/:id/ports/:port` | Eliminar puerto |
-| POST | `/api/servers/:id/urls` | Agregar URL |
-| DELETE | `/api/servers/:id/urls/:urlId` | Eliminar URL |
-| POST | `/api/monitor/check/:id` | Verificar servidor |
-| POST | `/api/monitor/check-all` | Verificar todos |
-| GET/PUT | `/api/settings` | Configuración de intervalo |
+| Método  | Ruta                           | Descripción                |
+| ------- | ------------------------------ | -------------------------- |
+| GET     | `/api/servers`                 | Listar servidores          |
+| POST    | `/api/servers`                 | Agregar servidor           |
+| DELETE  | `/api/servers/:id`             | Eliminar servidor          |
+| POST    | `/api/servers/:id/ports`       | Agregar puerto             |
+| DELETE  | `/api/servers/:id/ports/:port` | Eliminar puerto            |
+| POST    | `/api/servers/:id/urls`        | Agregar URL                |
+| DELETE  | `/api/servers/:id/urls/:urlId` | Eliminar URL               |
+| POST    | `/api/monitor/check/:id`       | Verificar servidor         |
+| POST    | `/api/monitor/check-all`       | Verificar todos            |
+| GET/PUT | `/api/settings`                | Configuración de intervalo |
 
 | GET | `/api/config/email` | Obtener configuración de email (sin contraseña) |
 | PUT | `/api/config/email` | Actualizar configuración de email |
@@ -78,4 +78,4 @@ El sistema envía correos HTML automáticamente cuando detecta cambios de estado
 **Nota para entornos internos:** si el servidor SMTP solo es accesible por IP privada, usar la IP directa como `smtpHost` en lugar del hostname.
 
 ---
-*Actualizado: 2026-03-03*
+*Actualizado: 2026-03-08*

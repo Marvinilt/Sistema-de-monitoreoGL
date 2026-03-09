@@ -11,7 +11,8 @@
 1. Crea la rama de feature correspondiente si no existe.
 
 ### Al Finalizar el desarrollo de una funcionalidad
-1. Actualiza `README.md` (instrucciones, fecha y descripción de feature).
-2. Actualiza `docs/DocumentacionTecnica.md` (arquitectura, endpoints, diseño, fecha).
-3. Realiza el commit de todos los cambios con una descripción detallada del desarrollo y ha push al feature branch.
-4. Crea un Pull Request del feature branch hacia `develop` con título `feat(<scope>): <descripción>`.
+1. Cuando el usuario indique que ha finalizado el desarrollo realiza estas acciones:
+    a. Actualiza `README.md` (instrucciones, fecha y descripción de feature).
+    b. Actualiza `docs/DocumentacionTecnica.md` (arquitectura, endpoints, diseño, fecha).
+    c. Realiza el commit de todos los cambios con una descripción detallada del desarrollo y has push al feature branch.
+    d. Crea un Pull Request del feature branch hacia `develop` con título `feat(<scope>): <descripción>`.
