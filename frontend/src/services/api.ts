@@ -13,6 +13,9 @@ export const agregarServidor = (nombre: string, host: string): Promise<Servidor>
 export const eliminarServidor = (id: string): Promise<void> =>
   http.delete(`/servers/${id}`).then(() => undefined);
 
+export const renombrarServidor = (id: string, nombre: string): Promise<Servidor> =>
+  http.patch<Servidor>(`/servers/${id}`, { nombre }).then((r) => r.data);
+
 // Puertos
 export const agregarPuerto = (servidorId: string, puerto: number): Promise<Servidor> =>
   http.post<Servidor>(`/servers/${servidorId}/ports`, { puerto }).then((r) => r.data);
@@ -50,3 +53,7 @@ export const actualizarConfiguracionEmail = (config: ConfiguracionEmail): Promis
 
 export const probarConexionEmail = (config: ConfiguracionEmail): Promise<ResultadoPruebaConexion> =>
   http.post<ResultadoPruebaConexion>('/config/email/test', config).then((r) => r.data);
+
+// Logs
+export const obtenerNotificaciones = (): Promise<{ notificaciones: { claveDeduplicacion: string, timestamp: string }[] }> =>
+  http.get('/notifications').then((r) => r.data);

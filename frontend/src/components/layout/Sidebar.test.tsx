@@ -73,13 +73,13 @@ describe('Sidebar - Propiedad 7: navegación activa', () => {
     expect(links.length).toBe(4);
   });
 
-  it('muestra el logo CyberMonitor', () => {
+  it('muestra el logo MonitorSistemas-GL', () => {
     const { getByText } = render(
       <MemoryRouter initialEntries={['/']}>
         <Sidebar />
       </MemoryRouter>
     );
-    expect(getByText('CyberMonitor')).toBeTruthy();
+    expect(getByText('MonitorSistemas-GL')).toBeTruthy();
   });
 
   it('muestra la versión v2.4.0-Alpha', () => {
