@@ -42,17 +42,16 @@ export function LatencyChart({ data, activeFilter: externalFilter, onFilterChang
   return (
     <div className="glass-panel rounded-lg p-4" role="region" aria-label="Gráfico de latencia">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-xs text-gray-400 uppercase tracking-wider">Latency</p>
+        <p className="text-xs text-gray-400 uppercase tracking-wider">Latencia</p>
         <div className="flex gap-1" role="group" aria-label="Filtro de tiempo">
           {FILTERS.map((f) => (
             <button
               key={f}
               onClick={() => handleFilterChange(f)}
-              className={`px-2 py-0.5 text-xs font-mono rounded transition-colors ${
-                activeFilter === f
+              className={`px-2 py-0.5 text-xs font-mono rounded transition-colors ${activeFilter === f
                   ? 'bg-primary text-white'
                   : 'text-gray-400 hover:text-white'
-              }`}
+                }`}
               aria-pressed={activeFilter === f}
             >
               {f}

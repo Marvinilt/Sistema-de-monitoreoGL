@@ -41,7 +41,27 @@ export class ServicioMonitoreo {
       this.verificadorHTTPS.verificarUrls(servidor.urls),
     ]);
 
-    const estadoGeneral = determinarEstado(puertos, urls);
+    // Mock: Simular agente que reporta recursos aleatorios
+    // Idealmente: await axios.get(`http://${servidor.host}:9000/metrics`)
+    const parametrosConfig = this.store.obtenerConfiguracionParametros();
+    const cpuPorcentaje = Math.random() * 100;
+    const ramPorcentaje = Math.random() * 100;
+    const discoPorcentaje = Math.random() * 100;
+
+    const recursos: import('../types').RecursosServidor = {
+      cpuPorcentaje,
+      ramPorcentaje,
+      discoPorcentaje,
+      timestamp: new Date().toISOString(),
+    };
+
+    let recursosCríticos = false;
+    if (cpuPorcentaje > parametrosConfig.umbralCpuPorcentaje) recursosCríticos = true;
+    if (ramPorcentaje > parametrosConfig.umbralRamPorcentaje) recursosCríticos = true;
+    if (discoPorcentaje > parametrosConfig.umbralDiscoPorcentaje) recursosCríticos = true;
+
+    const estadoBase = determinarEstado(puertos, urls);
+    const estadoGeneral: EstadoServidor = recursosCríticos ? 'alerta' : estadoBase;
 
     // Actualizar URLs con resultados
     const urlsActualizadas: UrlMonitoreada[] = servidor.urls.map((u) => {
@@ -56,7 +76,7 @@ export class ServicioMonitoreo {
       };
     });
 
-    this.store.actualizarEstadoServidor(servidorId, estadoGeneral, urlsActualizadas, puertos);
+    this.store.actualizarEstadoServidor(servidorId, estadoGeneral, urlsActualizadas, puertos, recursos);
     this.onUpdate?.(servidorId);
 
     const resultado: ResultadoVerificacion = {
@@ -64,6 +84,7 @@ export class ServicioMonitoreo {
       timestamp: new Date().toISOString(),
       puertos,
       urls,
+      recursos,
       estadoGeneral,
     };
 
@@ -89,13 +110,27 @@ function determinarEstado(
   puertos: ResultadoVerificacion['puertos'],
   urls: ResultadoUrlVerificacion[]
 ): EstadoServidor {
+  const hayUrls = urls.length > 0;
+  const todasUrlsDisponibles = hayUrls && urls.every(
+    (u) => u.estado === 'disponible'
+  );
+
+  // Si hay URLs y todas responden correctamente, el servidor está OK aunque
+  // los puertos TCP no sean alcanzables (puede ser una restricción de red/firewall
+  // desde la máquina del monitor, pero el servicio HTTP es accesible)
+  if (todasUrlsDisponibles) return 'ok';
+
+  const hayUrlProblema = hayUrls && urls.some(
+    (u) => u.estado === 'no_disponible' || u.estado === 'error_certificado'
+  );
+  if (hayUrlProblema) return 'alerta';
+
+  // Sin URLs: depender únicamente de los puertos TCP
   const hayPuertoProblema = puertos.some(
     (p) => p.estado === 'cerrado' || p.estado === 'sin_respuesta'
   );
-  const hayUrlProblema = urls.some(
-    (u) => u.estado === 'no_disponible' || u.estado === 'error_certificado'
-  );
-  if (hayPuertoProblema || hayUrlProblema) return 'alerta';
+  if (hayPuertoProblema) return 'alerta';
+
   if (puertos.length === 0 && urls.length === 0) return 'desconocido';
   return 'ok';
 }

@@ -2,25 +2,126 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* Soporte global para modo claro sin requerir cambios clase a clase */
+  html:not(.dark) body {
+    background-color: #f3f4f6;
+    color: #111827;
+  }
+
+  html:not(.dark) .bg-background-dark {
+    background-color: #f3f4f6 !important;
+  }
+
+  html:not(.dark) .bg-panel-dark {
+    background-color: #ffffff !important;
+  }
+
+  html:not(.dark) .text-white,
+  html:not(.dark) .text-gray-100 {
+    color: #111827 !important; /* Gris muy oscuro / Negro */
+  }
+
+  html:not(.dark) .text-gray-200 {
+    color: #1f2937 !important; /* Gris oscuro */
+  }
+
+  html:not(.dark) .text-gray-300 {
+    color: #374151 !important; /* Gris medio-oscuro */
+  }
+
+  html:not(.dark) .text-gray-400 {
+    color: #4b5563 !important; /* Gris medio */
+  }
+
+  html:not(.dark) .text-gray-500 {
+    color: #4b5563 !important; /* Más oscuro en lugar del habitual 500 para mayor legibilidad */
+  }
+
+  html:not(.dark) .border-white\/10 {
+    border-color: rgba(0, 0, 0, 0.1) !important;
+  }
+
+  html:not(.dark) .border-white\/5 {
+    border-color: rgba(0, 0, 0, 0.05) !important;
+  }
+
+  html:not(.dark) .bg-white\/5 {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+  }
+
+  html:not(.dark) .hover\:bg-white\/5:hover {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
 @layer components {
   /* Panel con efecto glassmorphism */
   .glass-panel {
-    @apply bg-panel-dark bg-opacity-80 backdrop-blur-md border border-white border-opacity-10 rounded-xl;
+    @apply bg-panel-dark bg-opacity-80 backdrop-blur-md border border-white border-opacity-10 rounded-xl transition-all duration-300;
+  }
+
+  html:not(.dark) .glass-panel {
+    background-color: #ffffff !important;
+    border-color: #e5e7eb !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  /* Soft gray for inner containers instead of dark transparencies */
+  html:not(.dark) .bg-background-dark\/50 {
+    background-color: #f9fafb !important;
+    border: 1px solid #e5e7eb;
+  }
+  
+  /* Convert neon text badges to solid pills in light mode */
+  html:not(.dark) .text-accent-neon.border-accent-neon {
+    background-color: #10b981 !important; /* Tailwind emerald-500 */
+    color: #ffffff !important;
+    border-color: transparent !important;
+  }
+  
+  html:not(.dark) .text-alert-neon.border-alert-neon {
+    background-color: #ef4444 !important; /* Tailwind red-500 */
+    color: #ffffff !important;
+    border-color: transparent !important;
+  }
+  
+  html:not(.dark) .text-warning.border-warning {
+    background-color: #f59e0b !important; /* Tailwind amber-500 */
+    color: #ffffff !important;
+    border-color: transparent !important;
+  }
+  
+  html:not(.dark) .text-gray-400.border-gray-600 { /* For unknown status */
+    background-color: #9ca3af !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
   }
 
   /* Glow verde neón para elementos OK */
   .neon-glow-green {
     box-shadow: 0 0 8px #00ff88, 0 0 20px rgba(0, 255, 136, 0.3);
   }
+  html:not(.dark) .neon-glow-green {
+    box-shadow: none !important;
+  }
 
   /* Glow verde para tarjetas con estado OK */
   .glow-success {
     box-shadow: 0 0 15px rgba(0, 255, 136, 0.2), 0 0 40px rgba(0, 255, 136, 0.1);
   }
+  html:not(.dark) .glow-success {
+    box-shadow: none !important;
+    border-color: #10b981 !important;
+  }
 
   /* Glow rojo para tarjetas con estado de alerta */
   .glow-danger {
     box-shadow: 0 0 15px rgba(255, 51, 102, 0.2), 0 0 40px rgba(255, 51, 102, 0.1);
+  }
+  html:not(.dark) .glow-danger {
+    box-shadow: none !important;
+    border-color: #ef4444 !important;
   }
 
   /* Indicador LED pulsante */

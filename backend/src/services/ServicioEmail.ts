@@ -29,10 +29,14 @@ const ICONOS_ESTADO: Record<string, string> = {
 };
 
 function colorEstado(estado: string): string {
+  if (estado.startsWith('alerta')) return COLORES_ESTADO['alerta'];
+  if (estado.startsWith('ok')) return COLORES_ESTADO['ok'];
   return COLORES_ESTADO[estado] ?? '#e2e3e5';
 }
 
 function iconoEstado(estado: string): string {
+  if (estado.startsWith('alerta')) return ICONOS_ESTADO['alerta'];
+  if (estado.startsWith('ok')) return ICONOS_ESTADO['ok'];
   return ICONOS_ESTADO[estado] ?? '❓';
 }
 

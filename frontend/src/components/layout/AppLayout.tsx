@@ -7,8 +7,8 @@ import { Header } from './Header';
 
 export function AppLayout() {
   return (
-    <div className="flex h-screen bg-background-dark overflow-hidden">
-      {/* Fixed sidebar */}
+    <div className="flex h-screen bg-background-dark">
+      {/* Fixed sidebar — uses relative positioning for the collapse tab */}
       <Sidebar />
 
       {/* Right column: header + content */}

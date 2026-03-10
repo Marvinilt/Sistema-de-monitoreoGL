@@ -33,6 +33,11 @@ export function useServers() {
     return nuevo;
   }, []);
 
+  const renombrarServidor = useCallback(async (id: string, nombre: string) => {
+    const actualizado = await api.renombrarServidor(id, nombre);
+    setServidores((prev) => prev.map((s) => (s.id === id ? actualizado : s)));
+  }, []);
+
   const eliminarServidor = useCallback(async (id: string) => {
     await api.eliminarServidor(id);
     setServidores((prev) => prev.filter((s) => s.id !== id));
@@ -64,6 +69,7 @@ export function useServers() {
     error,
     actualizarServidor,
     agregarServidor,
+    renombrarServidor,
     eliminarServidor,
     agregarPuerto,
     eliminarPuerto,

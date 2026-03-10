@@ -119,7 +119,7 @@ export function SettingsPanel() {
       {/* Notificaciones por Email */}
       <div className="border rounded-lg p-4 bg-white shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-gray-800">Notificaciones por Email</h2>
+          <h2 className="text-base font-semibold text-gray-800">Configuración de notificaciones</h2>
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <span className="text-sm text-gray-600">
               {email.habilitado ? 'Habilitado' : 'Deshabilitado'}

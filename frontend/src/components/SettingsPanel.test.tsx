@@ -39,7 +39,7 @@ describe('SettingsPanel - sección de email', () => {
 
     // Esperar a que se cargue la configuración de email
     await waitFor(() => {
-      expect(screen.getByText('Notificaciones por Email')).toBeTruthy();
+      expect(screen.getByText('Configuración de notificaciones')).toBeTruthy();
     });
 
     // Campos SMTP

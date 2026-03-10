@@ -3,6 +3,7 @@
 
 import { useState, useMemo } from 'react';
 import { useServers } from '../../hooks/useServers';
+import { useMonitor } from '../../hooks/useMonitor';
 import { MetricCard } from './MetricCard';
 import { HealthRingChart } from './HealthRingChart';
 import { LatencyChart, LatencyData, TimeFilter } from './LatencyChart';
@@ -19,11 +20,12 @@ function generateLatencyData(points: number, maxMs: number): { timestamp: string
 const SIMULATED_DATA: LatencyData = {
   '60m': generateLatencyData(12, 200),
   '24h': generateLatencyData(24, 300),
-  '7d':  generateLatencyData(14, 400),
+  '7d': generateLatencyData(14, 400),
 };
 
 export function Dashboard() {
-  const { servidores, cargando } = useServers();
+  const { servidores, cargando, actualizarServidor } = useServers();
+  const { verificarServidor, enProgreso } = useMonitor(actualizarServidor);
   const [activeFilter, setActiveFilter] = useState<TimeFilter>('60m');
 
   const totalServers = servidores.length;
@@ -31,16 +33,25 @@ export function Dashboard() {
   const alertServers = servidores.filter((s) => s.estado === 'alerta').length;
 
   const nodes: NodeRow[] = useMemo(() =>
-    servidores.map((s) => ({
-      id: s.id,
-      name: s.nombre,
-      status: s.estado === 'ok' ? 'ok' : s.estado === 'alerta' ? 'alert' : 'warning',
-      uptimeSeconds: s.ultimaVerificacion
-        ? Math.floor((Date.now() - new Date(s.creadoEn).getTime()) / 1000)
-        : 0,
-      loadPercent: Math.floor(Math.random() * 100),
-    })),
-    [servidores]
+    servidores.map((s) => {
+      const totalPuertos = s.resultadosPuertos.length;
+      const puertosAbiertos = s.resultadosPuertos.filter(p => p.estado === 'abierto').length;
+      // Calcula qué porcentaje de puertos monitoreados están accesibles (100% = todos OK)
+      const portLoad = totalPuertos > 0
+        ? Math.round(((totalPuertos - puertosAbiertos) / totalPuertos) * 100)
+        : 0;
+      return {
+        id: s.id,
+        name: s.nombre,
+        status: s.estado === 'ok' ? 'ok' : s.estado === 'alerta' ? 'alert' : 'warning',
+        uptimeSeconds: s.ultimaVerificacion
+          ? Math.floor((Date.now() - new Date(s.creadoEn).getTime()) / 1000)
+          : 0,
+        loadPercent: portLoad,
+        isChecking: enProgreso.has(s.id),
+      };
+    }),
+    [servidores, enProgreso]
   );
 
   if (cargando) {
@@ -55,9 +66,9 @@ export function Dashboard() {
     <div className="p-6 space-y-6">
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <MetricCard label="Total Servers" value={totalServers} borderColor="primary" icon="dns" />
-        <MetricCard label="OK Status" value={okServers} borderColor="accent-neon" icon="check_circle" />
-        <MetricCard label="Active Alerts" value={alertServers} borderColor="alert-neon" icon="warning" />
+        <MetricCard label="Servidores Totales" value={totalServers} borderColor="primary" icon="dns" />
+        <MetricCard label="En línea (OK)" value={okServers} borderColor="accent-neon" icon="check_circle" />
+        <MetricCard label="Alertas Activas" value={alertServers} borderColor="alert-neon" icon="warning" />
       </div>
 
       {/* Charts Row */}
@@ -75,7 +86,7 @@ export function Dashboard() {
       </div>
 
       {/* Node Table */}
-      <NodeTable nodes={nodes} onAction={(id) => console.log('action', id)} />
+      <NodeTable nodes={nodes} onAction={(id) => verificarServidor(id)} />
     </div>
   );
 }

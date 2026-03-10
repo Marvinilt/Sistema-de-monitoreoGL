@@ -13,6 +13,13 @@ export interface UrlMonitoreada {
   ultimaVerificacion: string | null;
 }
 
+export interface RecursosServidor {
+  cpuPorcentaje: number;
+  ramPorcentaje: number;
+  discoPorcentaje: number;
+  timestamp: string;
+}
+
 export interface Servidor {
   id: string;
   nombre: string;
@@ -20,6 +27,7 @@ export interface Servidor {
   puertos: number[];
   resultadosPuertos: ResultadoPuerto[]; // último resultado por puerto
   urls: UrlMonitoreada[];
+  recursos?: RecursosServidor;
   estado: EstadoServidor;
   ultimaVerificacion: string | null;
   creadoEn: string;
@@ -33,6 +41,7 @@ export interface ResultadoPuerto {
 
 export interface ConfiguracionApp {
   intervaloMonitoreoSegundos: number;
+  tema?: 'light' | 'dark';
 }
 
 export type EventoWebSocket =
@@ -47,6 +56,12 @@ export interface ConfiguracionEmail {
   smtpPassword: string;
   remitente: string;
   destinatarios: string[]; // mínimo 1 dirección válida
+}
+
+export interface ConfiguracionParametros {
+  umbralCpuPorcentaje: number;
+  umbralRamPorcentaje: number;
+  umbralDiscoPorcentaje: number;
 }
 
 export interface ResultadoPruebaConexion {

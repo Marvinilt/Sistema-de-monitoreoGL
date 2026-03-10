@@ -7,7 +7,7 @@ import { Servidor, EstadoServidor } from '../types';
 function crearServidor(id: string, estado: EstadoServidor): Servidor {
   return {
     id, nombre: `Srv ${id}`, host: `10.0.0.${id}`,
-    puertos: [], urls: [], estado,
+    puertos: [], resultadosPuertos: [], urls: [], estado,
     ultimaVerificacion: null, creadoEn: new Date().toISOString(),
   };
 }

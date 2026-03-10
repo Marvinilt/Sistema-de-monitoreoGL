@@ -14,7 +14,7 @@ const DEFAULT_DATA_DIR = path.join(__dirname, '../../data');
 const DEFAULT_CONFIG_FILE = path.join(DEFAULT_DATA_DIR, 'config.json');
 
 const CONFIG_DEFAULT: ConfiguracionCompleta = {
-  configuracion: { intervaloMonitoreoSegundos: 60 },
+  configuracion: { intervaloMonitoreoSegundos: 60, tema: 'dark' },
   servidores: [],
 };
 
@@ -45,6 +45,10 @@ export class ConfigStore {
         ...s,
         resultadosPuertos: s.resultadosPuertos ?? [],
       }));
+      // Retrocompatibilidad: asegurar que configuración tenga tema
+      if (!datos.configuracion.tema) {
+        datos.configuracion.tema = 'dark';
+      }
       return datos;
     } catch {
       return JSON.parse(JSON.stringify(CONFIG_DEFAULT));
@@ -100,6 +104,14 @@ export class ConfigStore {
     if (idx === -1) throw new Error(`Servidor con id "${id}" no encontrado`);
     this.datos.servidores.splice(idx, 1);
     this.guardar();
+  }
+
+  renombrarServidor(id: string, nombre: string): Servidor {
+    const servidor = this._getServidor(id);
+    if (!nombre.trim()) throw new Error('El nombre no puede estar vacío');
+    servidor.nombre = nombre.trim();
+    this.guardar();
+    return { ...servidor };
   }
 
   // --- Puertos ---
@@ -164,6 +176,34 @@ export class ConfigStore {
     return this.datos.email;
   }
 
+  // --- Configuración de Parámetros de Recursos ---
+
+  obtenerConfiguracionParametros(): import('../types').ConfiguracionParametros {
+    return this.datos.parametros || {
+      umbralCpuPorcentaje: 90,
+      umbralRamPorcentaje: 85,
+      umbralDiscoPorcentaje: 90
+    };
+  }
+
+  actualizarConfiguracionParametros(config: import('../types').ConfiguracionParametros): import('../types').ConfiguracionParametros {
+    const vars = [
+      { name: 'CPU', val: config.umbralCpuPorcentaje },
+      { name: 'RAM', val: config.umbralRamPorcentaje },
+      { name: 'Disco', val: config.umbralDiscoPorcentaje }
+    ];
+
+    for (const v of vars) {
+      if (typeof v.val !== 'number' || v.val < 1 || v.val > 100) {
+        throw new Error(`El umbral de ${v.name} debe ser un número entre 1 y 100`);
+      }
+    }
+
+    this.datos.parametros = config;
+    this.guardar();
+    return this.datos.parametros;
+  }
+
   // --- Configuración ---
 
   obtenerConfiguracion(): ConfiguracionApp {
@@ -177,6 +217,12 @@ export class ConfigStore {
         throw new Error('El intervalo debe estar entre 30 y 3600 segundos');
       this.datos.configuracion.intervaloMonitoreoSegundos = intervalo;
     }
+    if (config.tema !== undefined) {
+      if (config.tema !== 'light' && config.tema !== 'dark') {
+        throw new Error('Tema inválido');
+      }
+      this.datos.configuracion.tema = config.tema;
+    }
     this.guardar();
     return this.datos.configuracion;
   }
@@ -187,13 +233,15 @@ export class ConfigStore {
     servidorId: string,
     estado: EstadoServidor,
     urls?: UrlMonitoreada[],
-    resultadosPuertos?: import('../types').ResultadoPuerto[]
+    resultadosPuertos?: import('../types').ResultadoPuerto[],
+    recursos?: import('../types').RecursosServidor
   ): void {
     const servidor = this._getServidor(servidorId);
     servidor.estado = estado;
     servidor.ultimaVerificacion = new Date().toISOString();
     if (urls) servidor.urls = urls;
     if (resultadosPuertos) servidor.resultadosPuertos = resultadosPuertos;
+    if (recursos) servidor.recursos = recursos;
     this.guardar();
   }
 

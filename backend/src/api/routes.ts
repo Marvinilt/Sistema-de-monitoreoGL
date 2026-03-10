@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import * as nodemailer from 'nodemailer';
 import { lookup as dnsLookup } from 'dns';
+import * as path from 'path';
 import { ConfigStore } from '../store/ConfigStore';
 import { ServicioMonitoreo } from '../services/ServicioMonitoreo';
 import { GestorWebSocket } from './websocket';
@@ -39,6 +40,21 @@ export function crearRouter(
     try {
       store.eliminarServidor(req.params.id);
       res.status(204).send();
+    } catch (err) {
+      res.status(404).json({ error: (err as Error).message });
+    }
+  });
+
+  // PATCH /api/servers/:id — renombrar servidor
+  router.patch('/servers/:id', (req: Request, res: Response) => {
+    try {
+      const { nombre } = req.body;
+      if (!nombre || !nombre.trim()) {
+        res.status(400).json({ error: 'nombre es requerido' });
+        return;
+      }
+      const servidor = store.renombrarServidor(req.params.id, nombre.trim());
+      res.json(servidor);
     } catch (err) {
       res.status(404).json({ error: (err as Error).message });
     }
@@ -206,6 +222,37 @@ export function crearRouter(
     } catch (err) {
       const mensaje = (err as Error).message ?? 'Error desconocido';
       res.json({ ok: false, mensaje });
+    }
+  });
+
+  // --- Configuración de Parámetros de Recursos ---
+
+  // GET /api/config/parametros
+  router.get('/config/parametros', (_req: Request, res: Response) => {
+    res.json(store.obtenerConfiguracionParametros());
+  });
+
+  // PUT /api/config/parametros
+  router.put('/config/parametros', (req: Request, res: Response) => {
+    try {
+      const config = store.actualizarConfiguracionParametros(req.body);
+      res.json(config);
+    } catch (err) {
+      res.status(400).json({ error: (err as Error).message });
+    }
+  });
+
+  // --- Registro de Notificaciones / Logs ---
+  router.get('/notifications', (_req: Request, res: Response) => {
+    try {
+      const dbPath = path.join(__dirname, '../../data/notifications.json');
+      if (require('fs').existsSync(dbPath)) {
+        res.json(JSON.parse(require('fs').readFileSync(dbPath, 'utf8')));
+      } else {
+        res.json({ notificaciones: [] });
+      }
+    } catch (e) {
+      res.status(500).json({ error: (e as Error).message });
     }
   });
 
