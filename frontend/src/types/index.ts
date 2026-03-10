@@ -33,6 +33,7 @@ export interface ResultadoPuerto {
 
 export interface ConfiguracionApp {
   intervaloMonitoreoSegundos: number;
+  tema?: 'light' | 'dark';
 }
 
 export type EventoWebSocket =

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { obtenerConfiguracion, actualizarConfiguracion } from '../services/api';
 
 type Theme = 'dark' | 'light';
 
@@ -24,7 +25,9 @@ function applyTheme(theme: Theme) {
 
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const [isInitializing, setIsInitializing] = useState(true);
 
+  // Apply theme class and save temporarily to local storage
   useEffect(() => {
     applyTheme(theme);
     try {
@@ -34,13 +37,39 @@ export function useTheme() {
     }
   }, [theme]);
 
+  // Read backend configuration on load
+  useEffect(() => {
+    obtenerConfiguracion()
+      .then(config => {
+        if (config.tema) {
+          setTheme(config.tema);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching theme configuration:', err);
+      })
+      .finally(() => {
+        setIsInitializing(false);
+      });
+  }, []);
+
   const toggleTheme = () => {
-    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme(prev => {
+      const newTheme = prev === 'dark' ? 'light' : 'dark';
+      
+      // Sync choice with backend asynchronously
+      actualizarConfiguracion({ tema: newTheme }).catch(err => {
+        console.error('Error saving theme configuration to backend:', err);
+      });
+      
+      return newTheme;
+    });
   };
 
   return {
     theme,
     toggleTheme,
     isDark: theme === 'dark',
+    isInitializing
   };
 }

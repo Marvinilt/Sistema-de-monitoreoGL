@@ -57,7 +57,7 @@ npm test
 | DELETE  | `/api/servers/:id/urls/:urlId` | Eliminar URL               |
 | POST    | `/api/monitor/check/:id`       | Verificar servidor         |
 | POST    | `/api/monitor/check-all`       | Verificar todos            |
-| GET/PUT | `/api/settings`                | Configuración de intervalo |
+| GET/PUT | `/api/settings`                | Configuración de intervalo e interfaz (Tema) |
 
 | GET | `/api/config/email` | Obtener configuración de email (sin contraseña) |
 | PUT | `/api/config/email` | Actualizar configuración de email |

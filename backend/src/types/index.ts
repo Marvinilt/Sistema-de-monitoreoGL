@@ -50,6 +50,7 @@ export interface ResultadoVerificacion {
 
 export interface ConfiguracionApp {
   intervaloMonitoreoSegundos: number; // 30 - 3600
+  tema?: 'light' | 'dark';
 }
 
 // Requisito 1.1, 1.8: Configuración de email con parámetros SMTP y lista de destinatarios

@@ -14,7 +14,7 @@ const DEFAULT_DATA_DIR = path.join(__dirname, '../../data');
 const DEFAULT_CONFIG_FILE = path.join(DEFAULT_DATA_DIR, 'config.json');
 
 const CONFIG_DEFAULT: ConfiguracionCompleta = {
-  configuracion: { intervaloMonitoreoSegundos: 60 },
+  configuracion: { intervaloMonitoreoSegundos: 60, tema: 'dark' },
   servidores: [],
 };
 
@@ -45,6 +45,10 @@ export class ConfigStore {
         ...s,
         resultadosPuertos: s.resultadosPuertos ?? [],
       }));
+      // Retrocompatibilidad: asegurar que configuración tenga tema
+      if (!datos.configuracion.tema) {
+        datos.configuracion.tema = 'dark';
+      }
       return datos;
     } catch {
       return JSON.parse(JSON.stringify(CONFIG_DEFAULT));
@@ -184,6 +188,12 @@ export class ConfigStore {
       if (intervalo < 30 || intervalo > 3600)
         throw new Error('El intervalo debe estar entre 30 y 3600 segundos');
       this.datos.configuracion.intervaloMonitoreoSegundos = intervalo;
+    }
+    if (config.tema !== undefined) {
+      if (config.tema !== 'light' && config.tema !== 'dark') {
+        throw new Error('Tema inválido');
+      }
+      this.datos.configuracion.tema = config.tema;
     }
     this.guardar();
     return this.datos.configuracion;
