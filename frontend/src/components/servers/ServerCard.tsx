@@ -20,6 +20,7 @@ export interface ServerCardProps {
     status: 'ok' | 'alert' | 'warning' | 'unknown';
     ports?: PortStatus[];
     urls?: UrlStatus[];
+    recursos?: { cpuPorcentaje: number; ramPorcentaje: number; discoPorcentaje: number; timestamp: string };
     onCheck: (id: string) => void;
     onClick?: (id: string) => void;
 }
@@ -31,6 +32,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({
     status,
     ports = [],
     urls = [],
+    recursos,
     onCheck,
     onClick,
 }) => {
@@ -104,6 +106,44 @@ export const ServerCard: React.FC<ServerCardProps> = ({
                                     </div>
                                 );
                             })}
+                        </div>
+                    </div>
+                )}
+
+                {recursos && (
+                    <div className="mt-4 pt-3 border-t border-gray-700/30 dark:border-white/10">
+                        <h4 className="text-xs uppercase tracking-wider text-gray-500 mb-2">Recursos del Sistema</h4>
+                        <div className="grid grid-cols-3 gap-3">
+                            {/* CPU */}
+                            <div className="flex flex-col gap-1">
+                                <div className="flex justify-between items-center text-[10px] text-gray-400">
+                                    <span>CPU</span>
+                                    <span className={recursos.cpuPorcentaje > 85 ? 'text-danger' : ''}>{Math.round(recursos.cpuPorcentaje)}%</span>
+                                </div>
+                                <div className="w-full h-1.5 rounded-full bg-gray-700/50 overflow-hidden">
+                                    <div className={`h-full rounded-full ${recursos.cpuPorcentaje > 85 ? 'bg-danger' : recursos.cpuPorcentaje > 70 ? 'bg-warning' : 'bg-success'}`} style={{ width: `${recursos.cpuPorcentaje}%` }} />
+                                </div>
+                            </div>
+                            {/* RAM */}
+                            <div className="flex flex-col gap-1">
+                                <div className="flex justify-between items-center text-[10px] text-gray-400">
+                                    <span>RAM</span>
+                                    <span className={recursos.ramPorcentaje > 85 ? 'text-danger' : ''}>{Math.round(recursos.ramPorcentaje)}%</span>
+                                </div>
+                                <div className="w-full h-1.5 rounded-full bg-gray-700/50 overflow-hidden">
+                                    <div className={`h-full rounded-full ${recursos.ramPorcentaje > 85 ? 'bg-danger' : recursos.ramPorcentaje > 70 ? 'bg-warning' : 'bg-success'}`} style={{ width: `${recursos.ramPorcentaje}%` }} />
+                                </div>
+                            </div>
+                            {/* Disco */}
+                            <div className="flex flex-col gap-1">
+                                <div className="flex justify-between items-center text-[10px] text-gray-400">
+                                    <span>Disco</span>
+                                    <span className={recursos.discoPorcentaje > 90 ? 'text-danger' : ''}>{Math.round(recursos.discoPorcentaje)}%</span>
+                                </div>
+                                <div className="w-full h-1.5 rounded-full bg-gray-700/50 overflow-hidden">
+                                    <div className={`h-full rounded-full ${recursos.discoPorcentaje > 90 ? 'bg-danger' : recursos.discoPorcentaje > 80 ? 'bg-warning' : 'bg-success'}`} style={{ width: `${recursos.discoPorcentaje}%` }} />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}

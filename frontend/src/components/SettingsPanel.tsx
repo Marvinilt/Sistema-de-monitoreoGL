@@ -10,6 +10,9 @@ const EMAIL_VACIO: ConfiguracionEmail = {
   smtpPassword: '',
   remitente: '',
   destinatarios: [],
+  umbralCpuPorcentaje: 90,
+  umbralRamPorcentaje: 85,
+  umbralDiscoPorcentaje: 90,
 };
 
 export function SettingsPanel() {
@@ -119,7 +122,7 @@ export function SettingsPanel() {
       {/* Notificaciones por Email */}
       <div className="border rounded-lg p-4 bg-white shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-gray-800">Notificaciones por Email</h2>
+          <h2 className="text-base font-semibold text-gray-800">Configuración de notificaciones</h2>
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <span className="text-sm text-gray-600">
               {email.habilitado ? 'Habilitado' : 'Deshabilitado'}
@@ -193,6 +196,45 @@ export function SettingsPanel() {
                 placeholder="Monitor Servidores <monitor@example.com>"
                 className="w-full border rounded px-2 py-1 text-sm"
               />
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-gray-100">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Parámetros de Alerta de Recursos</h3>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">CPU Máxima (%)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={email.umbralCpuPorcentaje ?? 90}
+                  onChange={(e) => setEmail((prev) => ({ ...prev, umbralCpuPorcentaje: Number(e.target.value) }))}
+                  className="w-full border rounded px-2 py-1 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">RAM Máxima (%)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={email.umbralRamPorcentaje ?? 85}
+                  onChange={(e) => setEmail((prev) => ({ ...prev, umbralRamPorcentaje: Number(e.target.value) }))}
+                  className="w-full border rounded px-2 py-1 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Disco Máximo (%)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={email.umbralDiscoPorcentaje ?? 90}
+                  onChange={(e) => setEmail((prev) => ({ ...prev, umbralDiscoPorcentaje: Number(e.target.value) }))}
+                  className="w-full border rounded px-2 py-1 text-sm"
+                />
+              </div>
             </div>
           </div>
 

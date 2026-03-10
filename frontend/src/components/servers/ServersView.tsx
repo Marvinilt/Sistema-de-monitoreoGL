@@ -65,6 +65,7 @@ export const ServersView: React.FC = () => {
                 url: u.url,
                 status: u.estado
             })),
+            recursos: s.recursos,
             onCheck: handleCheck,
             onClick: setSelectedServerId
         };

@@ -13,6 +13,13 @@ export interface UrlMonitoreada {
   ultimaVerificacion: string | null; // ISO 8601
 }
 
+export interface RecursosServidor {
+  cpuPorcentaje: number;
+  ramPorcentaje: number;
+  discoPorcentaje: number;
+  timestamp: string; // ISO 8601
+}
+
 export interface Servidor {
   id: string;
   nombre: string;
@@ -20,6 +27,7 @@ export interface Servidor {
   puertos: number[];
   resultadosPuertos: ResultadoPuerto[]; // último resultado por puerto
   urls: UrlMonitoreada[];
+  recursos?: RecursosServidor;
   estado: EstadoServidor;
   ultimaVerificacion: string | null; // ISO 8601
   creadoEn: string; // ISO 8601
@@ -62,6 +70,9 @@ export interface ConfiguracionEmail {
   smtpPassword: string;
   remitente: string;
   destinatarios: string[]; // mínimo 1 dirección válida RFC 5322
+  umbralCpuPorcentaje?: number;
+  umbralRamPorcentaje?: number;
+  umbralDiscoPorcentaje?: number;
 }
 
 // Requisito 2.1-2.4: Representa una transición de estado de un recurso monitoreable

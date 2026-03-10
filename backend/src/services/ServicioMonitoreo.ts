@@ -41,7 +41,31 @@ export class ServicioMonitoreo {
       this.verificadorHTTPS.verificarUrls(servidor.urls),
     ]);
 
-    const estadoGeneral = determinarEstado(puertos, urls);
+    // Mock: Simular agente que reporta recursos aleatorios
+    // Idealmente: await axios.get(`http://${servidor.host}:9000/metrics`)
+    const emailConfig = this.store.obtenerConfiguracionEmail();
+    const cpuPorcentaje = Math.random() * 100;
+    const ramPorcentaje = Math.random() * 100;
+    const discoPorcentaje = Math.random() * 100;
+
+    const recursos: import('../types').RecursosServidor = {
+      cpuPorcentaje,
+      ramPorcentaje,
+      discoPorcentaje,
+      timestamp: new Date().toISOString(),
+    };
+
+    let recursosCríticos = false;
+    if (emailConfig) {
+       if (emailConfig.umbralCpuPorcentaje && cpuPorcentaje > emailConfig.umbralCpuPorcentaje) recursosCríticos = true;
+       if (emailConfig.umbralRamPorcentaje && ramPorcentaje > emailConfig.umbralRamPorcentaje) recursosCríticos = true;
+       if (emailConfig.umbralDiscoPorcentaje && discoPorcentaje > emailConfig.umbralDiscoPorcentaje) recursosCríticos = true;
+    } else {
+       if (cpuPorcentaje > 90 || ramPorcentaje > 85 || discoPorcentaje > 90) recursosCríticos = true;
+    }
+
+    const estadoBase = determinarEstado(puertos, urls);
+    const estadoGeneral: EstadoServidor = recursosCríticos ? 'alerta' : estadoBase;
 
     // Actualizar URLs con resultados
     const urlsActualizadas: UrlMonitoreada[] = servidor.urls.map((u) => {
@@ -56,7 +80,7 @@ export class ServicioMonitoreo {
       };
     });
 
-    this.store.actualizarEstadoServidor(servidorId, estadoGeneral, urlsActualizadas, puertos);
+    this.store.actualizarEstadoServidor(servidorId, estadoGeneral, urlsActualizadas, puertos, recursos);
     this.onUpdate?.(servidorId);
 
     const resultado: ResultadoVerificacion = {

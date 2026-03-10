@@ -171,6 +171,18 @@ export class ConfigStore {
 
   actualizarConfiguracionEmail(config: ConfiguracionEmail): ConfiguracionEmail {
     validarDestinatarios(config.destinatarios);
+    
+    // Validar umbrales si existen
+    if (config.umbralCpuPorcentaje !== undefined && (config.umbralCpuPorcentaje < 1 || config.umbralCpuPorcentaje > 100)) {
+       throw new Error('El umbral de CPU debe estar entre 1 y 100');
+    }
+    if (config.umbralRamPorcentaje !== undefined && (config.umbralRamPorcentaje < 1 || config.umbralRamPorcentaje > 100)) {
+       throw new Error('El umbral de RAM debe estar entre 1 y 100');
+    }
+    if (config.umbralDiscoPorcentaje !== undefined && (config.umbralDiscoPorcentaje < 1 || config.umbralDiscoPorcentaje > 100)) {
+       throw new Error('El umbral de Disco debe estar entre 1 y 100');
+    }
+
     this.datos.email = config;
     this.guardar();
     return this.datos.email;
@@ -205,13 +217,15 @@ export class ConfigStore {
     servidorId: string,
     estado: EstadoServidor,
     urls?: UrlMonitoreada[],
-    resultadosPuertos?: import('../types').ResultadoPuerto[]
+    resultadosPuertos?: import('../types').ResultadoPuerto[],
+    recursos?: import('../types').RecursosServidor
   ): void {
     const servidor = this._getServidor(servidorId);
     servidor.estado = estado;
     servidor.ultimaVerificacion = new Date().toISOString();
     if (urls) servidor.urls = urls;
     if (resultadosPuertos) servidor.resultadosPuertos = resultadosPuertos;
+    if (recursos) servidor.recursos = recursos;
     this.guardar();
   }
 
