@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Servidor, UrlMonitoreada, ConfiguracionApp, ConfiguracionEmail, ResultadoPruebaConexion } from '../types';
+import { Servidor, UrlMonitoreada, ConfiguracionApp, ConfiguracionEmail, ConfiguracionParametros, ResultadoPruebaConexion } from '../types';
 
 const http = axios.create({ baseURL: '/api' });
 
@@ -53,6 +53,13 @@ export const actualizarConfiguracionEmail = (config: ConfiguracionEmail): Promis
 
 export const probarConexionEmail = (config: ConfiguracionEmail): Promise<ResultadoPruebaConexion> =>
   http.post<ResultadoPruebaConexion>('/config/email/test', config).then((r) => r.data);
+
+// Configuración de Parámetros
+export const obtenerConfiguracionParametros = (): Promise<ConfiguracionParametros | null> =>
+  http.get<ConfiguracionParametros>('/config/parametros').then((r) => r.data).catch(() => null);
+
+export const actualizarConfiguracionParametros = (config: ConfiguracionParametros): Promise<ConfiguracionParametros> =>
+  http.put<ConfiguracionParametros>('/config/parametros', config).then((r) => r.data);
 
 // Logs
 export const obtenerNotificaciones = (): Promise<{ notificaciones: { claveDeduplicacion: string, timestamp: string }[] }> =>

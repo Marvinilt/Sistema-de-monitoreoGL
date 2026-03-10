@@ -56,9 +56,12 @@ export interface ConfiguracionEmail {
   smtpPassword: string;
   remitente: string;
   destinatarios: string[]; // mínimo 1 dirección válida
-  umbralCpuPorcentaje?: number;
-  umbralRamPorcentaje?: number;
-  umbralDiscoPorcentaje?: number;
+}
+
+export interface ConfiguracionParametros {
+  umbralCpuPorcentaje: number;
+  umbralRamPorcentaje: number;
+  umbralDiscoPorcentaje: number;
 }
 
 export interface ResultadoPruebaConexion {

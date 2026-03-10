@@ -171,21 +171,37 @@ export class ConfigStore {
 
   actualizarConfiguracionEmail(config: ConfiguracionEmail): ConfiguracionEmail {
     validarDestinatarios(config.destinatarios);
-    
-    // Validar umbrales si existen
-    if (config.umbralCpuPorcentaje !== undefined && (config.umbralCpuPorcentaje < 1 || config.umbralCpuPorcentaje > 100)) {
-       throw new Error('El umbral de CPU debe estar entre 1 y 100');
-    }
-    if (config.umbralRamPorcentaje !== undefined && (config.umbralRamPorcentaje < 1 || config.umbralRamPorcentaje > 100)) {
-       throw new Error('El umbral de RAM debe estar entre 1 y 100');
-    }
-    if (config.umbralDiscoPorcentaje !== undefined && (config.umbralDiscoPorcentaje < 1 || config.umbralDiscoPorcentaje > 100)) {
-       throw new Error('El umbral de Disco debe estar entre 1 y 100');
-    }
-
     this.datos.email = config;
     this.guardar();
     return this.datos.email;
+  }
+
+  // --- Configuración de Parámetros de Recursos ---
+
+  obtenerConfiguracionParametros(): import('../types').ConfiguracionParametros {
+    return this.datos.parametros || {
+      umbralCpuPorcentaje: 90,
+      umbralRamPorcentaje: 85,
+      umbralDiscoPorcentaje: 90
+    };
+  }
+
+  actualizarConfiguracionParametros(config: import('../types').ConfiguracionParametros): import('../types').ConfiguracionParametros {
+    const vars = [
+      { name: 'CPU', val: config.umbralCpuPorcentaje },
+      { name: 'RAM', val: config.umbralRamPorcentaje },
+      { name: 'Disco', val: config.umbralDiscoPorcentaje }
+    ];
+
+    for (const v of vars) {
+      if (typeof v.val !== 'number' || v.val < 1 || v.val > 100) {
+        throw new Error(`El umbral de ${v.name} debe ser un número entre 1 y 100`);
+      }
+    }
+
+    this.datos.parametros = config;
+    this.guardar();
+    return this.datos.parametros;
   }
 
   // --- Configuración ---

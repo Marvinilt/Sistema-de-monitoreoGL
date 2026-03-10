@@ -7,7 +7,7 @@ import { MemoryRouter } from 'react-router-dom';
 import fc from 'fast-check';
 import { Sidebar } from './Sidebar';
 
-const VALID_ROUTES = ['/', '/servers', '/settings', '/logs'];
+const VALID_ROUTES = ['/', '/servers', '/settings', '/parameters', '/logs'];
 
 describe('Sidebar - Propiedad 7: navegación activa', () => {
   it('exactamente un ítem está activo para cada ruta válida', () => {
@@ -63,14 +63,15 @@ describe('Sidebar - Propiedad 7: navegación activa', () => {
     );
   });
 
-  it('renderiza los 4 ítems de navegación', () => {
+  // Requisito 3.4 y 3.5: Navegación simple ("Tablero", "Servidores", "Config. SMTP", "Config. Parámetros", "Registros")
+  it('renderiza los 5 ítems de navegación', () => {
     const { container } = render(
       <MemoryRouter initialEntries={['/']}>
         <Sidebar />
       </MemoryRouter>
     );
     const links = container.querySelectorAll('a');
-    expect(links.length).toBe(4);
+    expect(links.length).toBe(5);
   });
 
   it('muestra el logo MonitorSistemas-GL', () => {

@@ -6,6 +6,7 @@ import { AppLayout } from '../components/layout/AppLayout';
 import { Dashboard } from '../views/Dashboard';
 import { ServersView } from '../views/ServersView';
 import { SettingsView } from '../views/SettingsView';
+import { ParametersView } from '../views/ParametersView';
 import { LogsView } from '../views/LogsView';
 
 export function AppRouter() {
@@ -16,6 +17,7 @@ export function AppRouter() {
           <Route index element={<Dashboard />} />
           <Route path="/servers" element={<ServersView />} />
           <Route path="/settings" element={<SettingsView />} />
+          <Route path="/parameters" element={<ParametersView />} />
           <Route path="/logs" element={<LogsView />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

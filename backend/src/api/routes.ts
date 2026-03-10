@@ -225,6 +225,23 @@ export function crearRouter(
     }
   });
 
+  // --- Configuración de Parámetros de Recursos ---
+
+  // GET /api/config/parametros
+  router.get('/config/parametros', (_req: Request, res: Response) => {
+    res.json(store.obtenerConfiguracionParametros());
+  });
+
+  // PUT /api/config/parametros
+  router.put('/config/parametros', (req: Request, res: Response) => {
+    try {
+      const config = store.actualizarConfiguracionParametros(req.body);
+      res.json(config);
+    } catch (err) {
+      res.status(400).json({ error: (err as Error).message });
+    }
+  });
+
   // --- Registro de Notificaciones / Logs ---
   router.get('/notifications', (_req: Request, res: Response) => {
     try {

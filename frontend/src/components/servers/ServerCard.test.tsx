@@ -1,8 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import fc from 'fast-check';
-import { ServerCard, ServerCardProps, PortStatus } from './ServerCard';
-import React from 'react';
+import { ServerCard, ServerCardProps } from './ServerCard';
 
 // Generador de puertos
 const portStatusArbitrary = fc.record({
@@ -25,14 +24,12 @@ describe('ServerCard - Property based tests', () => {
         fc.assert(
             fc.property(serverCardPropsArbitrary, (props) => {
                 const onCheck = vi.fn();
-                const onInvestigate = vi.fn();
                 const onClick = vi.fn();
 
                 const { container, unmount } = render(
                     <ServerCard
                         {...props}
                         onCheck={onCheck}
-                        onInvestigate={onInvestigate}
                         onClick={onClick}
                     />
                 );

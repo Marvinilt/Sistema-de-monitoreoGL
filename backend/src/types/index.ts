@@ -53,6 +53,7 @@ export interface ResultadoVerificacion {
   timestamp: string; // ISO 8601
   puertos: ResultadoPuerto[];
   urls: ResultadoUrlVerificacion[];
+  recursos?: RecursosServidor;
   estadoGeneral: EstadoServidor;
 }
 
@@ -70,15 +71,18 @@ export interface ConfiguracionEmail {
   smtpPassword: string;
   remitente: string;
   destinatarios: string[]; // mínimo 1 dirección válida RFC 5322
-  umbralCpuPorcentaje?: number;
-  umbralRamPorcentaje?: number;
-  umbralDiscoPorcentaje?: number;
+}
+
+export interface ConfiguracionParametros {
+  umbralCpuPorcentaje: number;
+  umbralRamPorcentaje: number;
+  umbralDiscoPorcentaje: number;
 }
 
 // Requisito 2.1-2.4: Representa una transición de estado de un recurso monitoreable
 export interface CambioEstado {
   recursoId: string;
-  tipoRecurso: 'servidor' | 'puerto' | 'url';
+  tipoRecurso: 'servidor' | 'puerto' | 'url' | 'recurso';
   nombreRecurso: string;
   estadoAnterior: string;
   estadoNuevo: string;
@@ -91,6 +95,7 @@ export interface ConfiguracionCompleta {
   configuracion: ConfiguracionApp;
   servidores: Servidor[];
   email?: ConfiguracionEmail; // opcional para retrocompatibilidad (Requisito 1.1, 1.8)
+  parametros?: ConfiguracionParametros;
 }
 
 // Tipos para la API REST

@@ -43,7 +43,7 @@ export class ServicioMonitoreo {
 
     // Mock: Simular agente que reporta recursos aleatorios
     // Idealmente: await axios.get(`http://${servidor.host}:9000/metrics`)
-    const emailConfig = this.store.obtenerConfiguracionEmail();
+    const parametrosConfig = this.store.obtenerConfiguracionParametros();
     const cpuPorcentaje = Math.random() * 100;
     const ramPorcentaje = Math.random() * 100;
     const discoPorcentaje = Math.random() * 100;
@@ -56,13 +56,9 @@ export class ServicioMonitoreo {
     };
 
     let recursosCríticos = false;
-    if (emailConfig) {
-       if (emailConfig.umbralCpuPorcentaje && cpuPorcentaje > emailConfig.umbralCpuPorcentaje) recursosCríticos = true;
-       if (emailConfig.umbralRamPorcentaje && ramPorcentaje > emailConfig.umbralRamPorcentaje) recursosCríticos = true;
-       if (emailConfig.umbralDiscoPorcentaje && discoPorcentaje > emailConfig.umbralDiscoPorcentaje) recursosCríticos = true;
-    } else {
-       if (cpuPorcentaje > 90 || ramPorcentaje > 85 || discoPorcentaje > 90) recursosCríticos = true;
-    }
+    if (cpuPorcentaje > parametrosConfig.umbralCpuPorcentaje) recursosCríticos = true;
+    if (ramPorcentaje > parametrosConfig.umbralRamPorcentaje) recursosCríticos = true;
+    if (discoPorcentaje > parametrosConfig.umbralDiscoPorcentaje) recursosCríticos = true;
 
     const estadoBase = determinarEstado(puertos, urls);
     const estadoGeneral: EstadoServidor = recursosCríticos ? 'alerta' : estadoBase;
@@ -88,6 +84,7 @@ export class ServicioMonitoreo {
       timestamp: new Date().toISOString(),
       puertos,
       urls,
+      recursos,
       estadoGeneral,
     };
 

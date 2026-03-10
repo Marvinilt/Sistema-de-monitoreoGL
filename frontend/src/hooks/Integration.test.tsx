@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from 'vitest';
-import * as api from '../services/api';
 import { useServers } from './useServers';
 import { useMonitor } from './useMonitor';
 

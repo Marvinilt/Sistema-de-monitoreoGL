@@ -149,6 +149,44 @@ export class ServicioNotificaciones {
       }
     }
 
+    // --- Recursos ---
+    if (resultado.recursos && servidorAntes.recursos) {
+      const configParam = this.store.obtenerConfiguracionParametros();
+      const uCPU = configParam.umbralCpuPorcentaje;
+      const uRAM = configParam.umbralRamPorcentaje;
+      const uDisco = configParam.umbralDiscoPorcentaje;
+
+      const evalEstado = (valor: number, umbral: number) => (valor > umbral ? 'alerta' : 'ok');
+      
+      const resAntes = servidorAntes.recursos;
+      const resNuevo = resultado.recursos;
+
+      const metricas = [
+        { id: 'cpu', nombre: 'CPU', antes: resAntes.cpuPorcentaje, nuevo: resNuevo.cpuPorcentaje, umbral: uCPU },
+        { id: 'ram', nombre: 'Memoria RAM', antes: resAntes.ramPorcentaje, nuevo: resNuevo.ramPorcentaje, umbral: uRAM },
+        { id: 'disco', nombre: 'Espacio de Disco', antes: resAntes.discoPorcentaje, nuevo: resNuevo.discoPorcentaje, umbral: uDisco }
+      ];
+
+      for (const m of metricas) {
+        const estadoAnt = evalEstado(m.antes, m.umbral);
+        const estadoNue = evalEstado(m.nuevo, m.umbral);
+        if (estadoAnt !== estadoNue) {
+          const detailNue = estadoNue === 'alerta' ? `alerta (${Math.round(m.nuevo)}%)` : `ok (${Math.round(m.nuevo)}%)`;
+          const detailAnt = estadoAnt === 'alerta' ? `alerta (${Math.round(m.antes)}%)` : `ok (${Math.round(m.antes)}%)`;
+          cambios.push({
+            recursoId: `${servidorId}:recurso:${m.id}`,
+            tipoRecurso: 'recurso',
+            nombreRecurso: m.nombre,
+            estadoAnterior: detailAnt,
+            estadoNuevo: detailNue,
+            timestamp,
+            servidorId,
+            servidorNombre,
+          });
+        }
+      }
+    }
+
     return cambios;
   }
 }

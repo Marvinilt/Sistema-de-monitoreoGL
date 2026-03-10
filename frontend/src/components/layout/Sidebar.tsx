@@ -14,6 +14,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Tablero', path: '/', icon: 'dashboard' },
   { label: 'Servidores', path: '/servers', icon: 'dns' },
   { label: 'Config. SMTP', path: '/settings', icon: 'mail' },
+  { label: 'Config. Parámetros', path: '/parameters', icon: 'settings_suggest' },
   { label: 'Registros', path: '/logs', icon: 'article' },
 ];
 
