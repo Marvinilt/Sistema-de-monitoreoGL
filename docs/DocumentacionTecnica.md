@@ -1,107 +1,61 @@
 # Documentación Técnica — Monitor de Servidores e Infraestructura
 
-## Funcionalidad: Estructura base del proyecto y tipos compartidos
+Esta documentación describe la arquitectura unificada y el funcionamiento actual del sistema de monitoreo. Para la revisión de cambios históricos, características por versión y evolución general, consulte el archivo [CHANGELOG.md](../CHANGELOG.md).
 
-**Fecha:** 2026-02-27
+## 1. Visión General y Arquitectura Global
 
-### Descripción
+El proyecto es una aplicación full-stack diseñada para monitorear en tiempo real puertos TCP y URLs HTTPS de servidores en la infraestructura, presentados con un dashboard temático "Cyber-Dark". 
 
-Implementación completa de la aplicación de monitoreo de servidores. Incluye backend (API REST + WebSocket + verificadores) y frontend (dashboard React).
+El sistema garantiza operaciones atómicas al recuperar/almacenar datos, tolerancia a fallos en caso de caídas de red y persistencia deduplicada para evitar inundar a los administradores con correos electrónicos repetidos.
 
-### Arquitectura
+```mermaid
+graph LR
+    subgraph Frontend [React / Vite :3000]
+        Dashboard
+        SettingsPanel
+        ServerCard
+        LogsView
+    end
 
+    subgraph Backend [Node.js / Express :3001]
+        API[Rutas REST]
+        WS[Gestor WebSocket]
+        
+        SM[Servicio Monitoreo]
+        Plan[Planificador]
+        SN[Servicio Notificaciones]
+        
+        VTCP[Verificador TCP]
+        VHTTPS[Verificador HTTPS]
+        
+        CS[(ConfigStore HTML/JSON)]
+        RN[(Notificaciones JSON)]
+    end
+
+    Frontend <-->|REST & WebSocket| Backend
+    API <--> CS
+    Plan --> SM
+    SM --> VTCP
+    SM --> VHTTPS
+    SM --> SN
+    SN --> RN
+    SN -->|SMTP| Email[Servidor Correo]
 ```
-Frontend (React/Vite :3000)  ←→  Backend (Express :3001)
-                                      ├── ConfigStore (JSON)
-                                      ├── VerificadorPuertos (TCP)
-                                      ├── VerificadorHTTPS (axios)
-                                      ├── ServicioMonitoreo
-                                      └── Planificador (setInterval)
-```
 
-### Componentes clave
+## 2. Modelos de Datos Centrales
 
-**Backend:**
-- `ConfigStore` — persistencia atómica en `data/config.json` con validaciones de duplicados, rango de puertos [0,65535] y formato de URL
-- `VerificadorPuertos` — conexión TCP con `net.createConnection`, timeout 5s
-- `VerificadorHTTPS` — GET con `axios`, timeout 10s, detección de errores SSL
-- `ServicioMonitoreo` — orquesta verificaciones en paralelo, determina estado ok/alerta/desconocido; persiste `resultadosPuertos` por servidor tras cada ciclo
-- `Planificador` — `setInterval` configurable entre 30s y 3600s
-- `GestorWebSocket` — emite `server-update` y `check-progress` a todos los clientes conectados
+El sistema se basa en las siguientes estructuras clave, persistidas en el backend y compartidas estáticamente (mediante interfaces TypeScript) con el frontend.
 
-**Frontend:**
-- `Dashboard` — contenedor principal con hooks `useServers` y `useMonitor`
-- `ServerCard` — tarjeta visual con fondo verde (ok) o rojo (alerta); muestra inline el estado de cada puerto y URL con código HTTP
-- `ServerDetailModal` — detalle de puertos y URLs con formularios inline y colores de estado
-- `SummaryBar` — conteo global OK/Alerta y botón "Verificar Todo"
-- `SettingsPanel` — configuración del intervalo de monitoreo
-
-### Dependencias agregadas
-
-**Backend:** `express`, `axios`, `uuid`, `ws`, `cors`, `fast-check`, `jest`, `ts-jest`
-
-**Frontend:** `react`, `react-dom`, `axios`, `tailwindcss`, `vite`, `vitest`, `fast-check`, `@testing-library/react`
-
-### Pruebas de propiedad implementadas
-
-| Propiedad | Descripción                                      | Herramienta      |
-| --------- | ------------------------------------------------ | ---------------- |
-| 1         | Registro de servidor persiste y es recuperable   | fast-check       |
-| 2         | Eliminación de servidor es completa              | fast-check       |
-| 3         | Rechazo de servidores duplicados                 | fast-check       |
-| 4         | Validación de puertos rechaza entradas inválidas | fast-check       |
-| 5         | Validación de URLs rechaza entradas inválidas    | manual           |
-| 6         | Clasificación de estado HTTP es exhaustiva       | fast-check       |
-| 7         | Renderizado de tarjeta refleja estado            | fast-check + RTL |
-| 8         | Conteo del resumen global es consistente         | fast-check       |
-| 9         | Validación del intervalo de monitoreo            | fast-check       |
-| 10        | Persistencia round-trip de configuración         | fast-check       |
-
----
-
-## Feature: Visualización de estados de puertos y URLs en tarjetas del dashboard
-
-**Fecha:** 2026-03-02
-
-### Descripción
-
-Mejora visual del dashboard que expone directamente en cada `ServerCard` el estado detallado de los puertos TCP y las URLs monitoreadas, sin necesidad de abrir el modal de detalle. Incluye indicadores de color, códigos HTTP de respuesta y alertas de certificado SSL.
-
-### Cambios realizados
-
-#### `backend/src/types/index.ts`
-- Se agregó el campo `resultadosPuertos: ResultadoPuerto[]` a la interfaz `Servidor` para persistir el último resultado de verificación por puerto junto al servidor.
-
-#### `frontend/src/types/index.ts`
-- Se sincronizó la interfaz `Servidor` del frontend con el nuevo campo `resultadosPuertos: ResultadoPuerto[]`.
-- Se exportó el tipo `EstadoPuerto` para uso en componentes.
-
-#### `backend/src/services/ServicioMonitoreo.ts`
-- `verificarServidor` ahora llama a `store.actualizarEstadoServidor` pasando también los `resultadosPuertos`, de modo que el estado de cada puerto queda persistido en `config.json` y disponible vía API.
-
-#### `frontend/src/components/ServerCard.tsx`
-- Cuando existen `resultadosPuertos` (post-verificación), se renderizan badges por puerto con:
-  - Indicador de color: verde (abierto), rojo (cerrado), amarillo (sin_respuesta)
-  - Número de puerto con tooltip que incluye latencia en ms
-- Para cada URL se muestra inline:
-  - Indicador de color según estado (disponible / no_disponible / error_certificado / desconocido)
-  - Nombre de dominio truncado
-  - Código HTTP de respuesta coloreado (verde < 400, rojo ≥ 400)
-  - Ícono 🔒 cuando hay error de certificado SSL
-- Antes de la primera verificación se muestra la lista de puertos configurados en texto plano.
-
-#### `frontend/src/components/ServerDetailModal.tsx`
-- Se aplican colores de estado a los puertos y URLs en el modal de detalle, consistentes con los de la tarjeta.
-
-#### `backend/tsconfig.json`
-- Se agregó `"types": ["jest", "node"]` y se eliminó `**/*.test.ts` del `exclude` para que el editor TypeScript reconozca los globals de Jest en los archivos de test.
-
-### Modelo de datos actualizado
-
+### Servidor y Resultados
 ```typescript
 interface Servidor {
-  // ... campos existentes ...
-  resultadosPuertos: ResultadoPuerto[]; // NUEVO — último resultado por puerto
+  id: string;             // UUID
+  nombre: string;         // Renombrable vía PATCH
+  ip: string;
+  puertos: number[];      // Rango válido [0, 65535]
+  urls: URLMonitor[];
+  resultadosPuertos: ResultadoPuerto[]; // Último estado procesado (Persistido)
+  estadoGlobal: 'ok' | 'alerta' | 'desconocido'; 
 }
 
 interface ResultadoPuerto {
@@ -109,94 +63,16 @@ interface ResultadoPuerto {
   estado: 'abierto' | 'cerrado' | 'sin_respuesta';
   latenciaMs: number | null;
 }
+
+interface URLMonitor {
+  id: string;
+  url: string;            // Formato válido HTTP/HTTPS
+  estado: 'disponible' | 'no_disponible' | 'error_certificado' | 'desconocido';
+  codigoHttp?: number;    // Verde (<400), Rojo (>=400)
+}
 ```
 
-### Comportamiento
-
-- Antes de la primera verificación: la tarjeta muestra los puertos configurados como lista de números y las URLs sin estado.
-- Después de verificar: cada puerto muestra su estado con color y cada URL muestra su estado, código HTTP y alerta de certificado si aplica.
-- Los estados son consistentes entre la tarjeta (`ServerCard`) y el modal de detalle (`ServerDetailModal`).
-
----
-
-## Feature: Sistema de Notificaciones por Correo Electrónico
-
-**Fecha:** 2026-03-03
-
-### Descripción
-
-Implementación completa del sistema de notificaciones por email. Cuando el ciclo de monitoreo detecta un cambio de estado en un servidor, puerto o URL, el sistema envía un correo HTML consolidado a los destinatarios configurados. Cada cambio se notifica exactamente una vez mediante un registro persistente de deduplicación.
-
-### Arquitectura
-
-```
-Planificador → ServicioMonitoreo → ServicioNotificaciones
-                                        ├── RegistroNotificaciones (notifications.json)
-                                        ├── ConfigStore (config.json → sección email)
-                                        └── ServicioEmail (nodemailer → SMTP)
-
-API REST (/api/config/email) → ConfigStore
-Frontend SettingsPanel → API REST
-```
-
-### Componentes nuevos
-
-#### `backend/src/services/ServicioNotificaciones.ts`
-- `procesarResultado(servidorAntes, resultado)` — compara estado anterior vs nuevo para servidor, puertos y URLs
-- `detectarCambios()` — genera lista de `CambioEstado` para recursos con transición real
-- Omite procesamiento si `habilitado: false` o sin configuración de email
-- Registra estado inicial sin notificar en primera verificación
-
-#### `backend/src/services/RegistroNotificaciones.ts`
-- Persiste en `backend/data/notifications.json`
-- Clave de deduplicación: `${recursoId}:${estadoAnterior}:${estadoNuevo}`
-- `yaNotificado(cambio)` — consulta si el cambio exacto ya fue notificado
-- `registrar(cambio)` — persiste el cambio notificado
-- Maneja archivo corrupto reiniciando vacío con log de advertencia
-
-#### `backend/src/services/ServicioEmail.ts`
-- `construirHtml(cambios)` — tabla HTML con colores e iconos por estado (✅🔴⚠️❓)
-- `enviarNotificacion(cambios)` — envío consolidado via nodemailer
-- Asunto: `[Monitor Servidores] N cambio(s) detectado(s) - DD/MM/YYYY HH:MM`
-- Timeout SMTP 10s, captura errores sin relanzar
-- Usa `dns.lookup` para respetar el archivo `hosts` del SO
-- `tls: { rejectUnauthorized: false }` para servidores con certificado expirado
-
-### Endpoints REST nuevos
-
-| Método | Ruta                     | Descripción                                    |
-| ------ | ------------------------ | ---------------------------------------------- |
-| GET    | `/api/config/email`      | Retorna config sin exponer `smtpPassword`      |
-| PUT    | `/api/config/email`      | Valida y persiste config; HTTP 400 si inválida |
-| POST   | `/api/config/email/test` | Prueba conexión SMTP; acepta config en body    |
-
-### Cambios en componentes existentes
-
-#### `backend/src/store/ConfigStore.ts`
-- `obtenerConfiguracionEmail()` — retorna sección `email` de config.json
-- `actualizarConfiguracionEmail(config)` — valida destinatarios RFC 5322, persiste
-
-#### `backend/src/services/ServicioMonitoreo.ts`
-- Captura estado anterior antes de actualizar y llama `ServicioNotificaciones.procesarResultado()` de forma asíncrona
-
-#### `backend/src/services/Planificador.ts`
-- Captura excepciones de `ServicioNotificaciones` sin interrumpir el ciclo
-
-#### `backend/src/api/routes.ts`
-- Nuevos endpoints de configuración de email
-- Endpoint de prueba SMTP acepta config en body (sin necesidad de guardar primero)
-
-#### `frontend/src/types/index.ts`
-- Nuevas interfaces: `ConfiguracionEmail`, `ResultadoPruebaConexion`
-
-#### `frontend/src/services/api.ts`
-- `obtenerConfiguracionEmail()`, `actualizarConfiguracionEmail()`, `probarConexionEmail(config)`
-
-#### `frontend/src/components/SettingsPanel.tsx`
-- Sección "Notificaciones por Email" con toggle, campos SMTP, lista de destinatarios y botón "Probar conexión"
-
-### Modelo de datos
-
+### Configuración SMTP y Alertas
 ```typescript
 interface ConfiguracionEmail {
   habilitado: boolean;
@@ -205,7 +81,7 @@ interface ConfiguracionEmail {
   smtpUsuario: string;
   smtpPassword: string;
   remitente: string;
-  destinatarios: string[]; // mínimo 1, formato RFC 5322
+  destinatarios: string[]; // Arreglo, mínimo 1 correo válido (RFC 5322)
 }
 
 interface CambioEstado {
@@ -220,53 +96,79 @@ interface CambioEstado {
 }
 ```
 
-### Dependencias agregadas
+## 3. Componentes del Backend (Core Engine)
 
-**Backend:** `nodemailer`, `@types/nodemailer`
+### 3.1. Motor de Monitoreo
+La orquestación del escaneo se divide en tres actores operativos:
 
-### Propiedades de corrección implementadas (fast-check)
+1. **`Planificador`**: Ejecuta `setInterval` basándose en el parámetro configurable del sistema (entre 30s y 3600s). Esta capa actúa como "Catch-All", interceptando y suprimiendo errores graves para que el ciclo de vida del proceso de Node.js nunca caiga.
+2. **`ServicioMonitoreo`**: Gestiona verificaciones asíncronas en paralelo (`Promise.all()`).  
+   - **Lógica de Priorización:** Evalúa primeramente el HTTPS. Si una máquina no expone puertos TCP internos (ya sea por limitación de VLAN, DMZ o Firewall) pero la suma de **todas sus URLs asignadas responden `disponible`**, el motor descarta el fallo TCP y asigna dinámicamente el estado padre como `ok`.
+   - **Monitoreo de Recursos SImulado:** Agregada lógica complementaria para consultar el estado del hardware simulado (consumo de CPU, Memoria RAM y Disco duros). Si estas mediciones superan sus umbrales definibles por el usuario, el servicio de monitoreo lo detecta y lo notifica.
+3. **Verificadores**:
+   - `VerificadorPuertos`: Emplea la interfaz nativa `net.createConnection()` con un umbral estricto de timeout (5 segundos).
+   - `VerificadorHTTPS`: Emplea la librería `axios`. Por defecto, simula cabeceras Web de navegador estándar (`User-Agent` de Chrome) para sortear restricciones tipo 403 provocadas por **Web Application Firewalls (WAF) genéricos**. Adicionalmente, asume intencionalmente los códigos HTTP `401` y `403` como **disponibles**, bajo la premisa que existe un servicio web funcional pero que simplemente deniega el paso sin el header de autenticación adecuado.
 
-| Propiedad | Descripción                                                            |
-| --------- | ---------------------------------------------------------------------- |
-| 1         | Deduplicación: `yaNotificado` retorna `true` para cambio ya registrado |
-| 2         | Round-trip: `registrar` → `yaNotificado` retorna `true`                |
-| 3         | Cambios distintos no son deduplicados                                  |
-| 4         | Detección correcta de cambios por tipo de recurso                      |
-| 5         | Sin cambio no genera notificación                                      |
-| 6         | HTML del correo contiene información de cada cambio                    |
-| 7         | Validación de destinatarios rechaza formatos inválidos                 |
+### 3.2. Sistema de Notificaciones (SMTP)
+Cuando el modulo `ServicioMonitoreo` detecta una transición real de estado:
+1. Deriva de forma asíncrona la tupla (Estado Anterior -> Estado Nuevo) a la función `ServicioNotificaciones.procesarResultado()`.
+2. Se genera un array tipo `CambioEstado` que, previo al envío de correo electrónico, se compara de forma lógica en el `RegistroNotificaciones` interno.
+3. Si el registro existe (usando la clave compuesta de persistencia `${recursoId}:${estadoAnterior}:${estadoNuevo}`), se detiene el flujo como medida de deduplicación (anti-spam). 
+4. Si es inédito, mediante `nodemailer`, se consolida un lote (Batch) de alertas y se construye un template HTML en vivo para inyectarlo en la tubería SMTP.
+5. Emplea la configuración `dns.lookup()` habilitada desde el Transporter para garantizar soporte operativo en redes locales Intranet con nombres de dominio declarados explícitamente en el archivo `/etc/hosts`.
 
-### Notas de conectividad SMTP
+### 3.3. Persistencia
+Operaciones atómicas manejadas por `ConfigStore.ts` y grabadas en estructuras JSON puras. Todo el tráfico pasa antes por validaciones unitarias en memoria (para rechazar duplicados) asegurando integridad antes de confirmar la promesa de I/O a disco.
 
-- El transporter usa `dns.lookup` (respeta `/etc/hosts` y `C:\Windows\System32\drivers\etc\hosts`)
-- Para servidores SMTP internos accesibles solo por IP, usar la IP directa como `smtpHost`
-- `ignoreTLS: true` + `tls: { rejectUnauthorized: false }` para relay interno sin TLS estricto
+## 4. Componentes del Frontend (UI Cyber-Dark / SaaS Light)
+
+Estructurada internamente sobre **React.js + TailwindCSS + Vite.js**, usando principios Glassmorphism, animaciones y esquemas modulares, e integrando además **un rediseño de Modo Claro accesible a través de un toggle de persistencia**:
+
+- **`Dashboard` (Contenedor Maestro):** Orquestador de vistas laterales basado en pestaña colapsable (`Sidebar`). Mantiene reactividad total en los cálculos matemáticos para resumir rápidamente incidencias (ej. Indexado de Puertos en Fallo) representadas en anillos SVG dinámicos. Incluye bloqueo preventivo de la interfaz (`isChecking`) cuando detecta una validación asíncrona viva con el backend.
+- **`ServerCard`:** El "widget" atómico. Brinda feedback del backend sin necesidad de accionar componentes adicionales. Emite renderizados condicionales (`box-shadow glow-success` vs `glow-danger`) e instancia listados renderizados al vuelo en formato LED para asimilar equipos de red físicos (Puntos TCP, URLs disponibles + códigos HTTP, avisos 🔒 SSL expirados, y estado % en vivo de CPU, RAM y Disco con alertas dinámicas).
+- **`ServerDetailModal`:** Panel de información profundo renderizado sobre efecto de desenfoque (`backdrop-blur`). Incorpora mecanismos avanzados *in-place-editing* mutando la lectura pasiva a cajas `input` directas para edición ágil del nombre del entorno.
+- **`LogsView`:** Lector nativo en forma tabulada consumiendo crudos limpios desde `notifications.json`. Presenta badges basados en severidad para facilitar las tareas de auditoría en auditorías NOC (Network Operations Centers).
+- **`ParametersView`:** Nuevo módulo interactivo (`Config. Parámetros`) dedicado a definir, reajustar y persistir los umbrales límite bajo los cuales el Motor de Monitoreo evalúa la severidad de los recursos reportados por los servidores.
+
+## 5. Estrategia de Pruebas (Test Suite)
+
+Las pruebas previenen directamente las regresiones apoyándose en el paradigma *Property-Based Testing* ejecutando cientos de permutaciones estresantes de Data en base a propiedades declaradas.
+
+| Módulo/Servidor              | Enfoque de la Propiedad                                                                                                                                                                   | Herramienta                              |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| **Motor Estructural**        | Resistencia a Colisión por Identidad (Servidores duplicados rechazados)                                                                                                                   | `fast-check` y `jest`                    |
+| **Parsing**                  | Verificación estricta del limite binario en TCP [0 - 65535]. Rechaza texto malicioso.                                                                                                     | `fast-check`                             |
+| **Manipulación (CRUD)**      | Eliminación en Cascada limpia integralmente cualquier referencia (Huérfanos eliminados).                                                                                                  | `fast-check`                             |
+| **Confiabilidad Asíncrona**  | Transiciones idénticas de red resuelven SIEMPRE en flag `yaNotificado=true` sin accionar el SMTP local (Hard Bounce Preventer).                                                           | `fast-check`                             |
+| **Saneamiento SMTP**         | Componentes validan las cabeceras bajo formato RFC 5322 en correos destino antes del spooler de correo.                                                                                   | `fast-check` y Regex                     |
+| **Motor Gráfico (UI/React)** | Propiedades semánticas de clase y paleta inyectan el CSS puro requerido para representar visualmente fallas con semáforos rojos / verdes nativos sin manipulación engañosa de datos base. | `RTL (@testing-library)` y  `fast-check` |
 
 ---
 
-## Feature: Rediseño UI Futurista (servers-view-components)
+## ANEXO: Referencia Rápida de API e Interactividad
 
-**Fecha:** 2026-03-08
+### Interfaz WebSockets
 
-### Descripción
+Conexión base hacia Endpoint `ws://localhost:3001/ws`.  
+Eventos estandarizados en la capa de transmisión continua:
+- `server-update`: Disparado individualmente cuando el motor termina con un Nodo.
+- `check-progress`: Enviado constantemente. Informa el progreso y dictamina bloqueos condicionales si los usuarios pulsan salvajemente el botón maestro del frontend.
 
-Rediseño completo de la interfaz de usuario bajo una temática "Cyber-Dark" futurista. Reemplazo íntegro de la vista de servidores, dashboard principal, configuración SMTP y registros, manteniendo interoperabilidad total con la base lógica (`useServers`, `useMonitor`, `api`). 
+### Directorio Root en Entorno Dev
 
-### Cambios visuales principales (Frontend)
-
-- **Layout y Sidebar:** Se implementó un layout principal con Sidebar colapsable animado y pestaña flotante discreta al borde derecho, maximizando el espacio para el dashboard. 
-- **Tarjetas de Servidores (`ServerCard`):** Ahora usan un estilo de paneles de cristal (glassmorphism) con efectos `glow-success` (OK) y `glow-danger` (Alert). Indicadores LED (CSS `box-shadow`) reemplazan el texto plano para el estado de puertos y URLs.
-- **Modal de Detalle (`ServerDetailModal`):** Rediseñado con fondos desenfocados, cuenta con edición *inline* directamente sobre el nombre del servidor (clic activa el input). 
-- **Tablero Principal (`Dashboard`):** Muestra el conteo en tiempo real calculando el porcentaje de la columna "Puertos con Falla". El botón Actualizar integra un feedback visual bloqueante (spinner animado `isChecking`) si el servidor se encuentra en un ciclo de verificación activo.
-- **Registros (`LogsView`):** Nueva vista de tabla responsiva con asignación de colores severidad-based recuperando los datos directamente del archivo de notificaciones del backend.
-
-### Cambios en Backend (API & Lógica)
-
-- **`PATCH /api/servers/:id`:** Nuevo endpoint para renombrar el servidor sin requerir re-crearlo. Controlado vía `store.renombrarServidor(id, nombre)`.
-- **Mitigación Error 403 (URLs Públicas):** El componente `VerificadorHTTPS.ts` inyecta Headers propios de Mozilla/Chrome (User-Agent, Accept) para prevenir bloqueos de Firewalls hacia solicitudes de bibliotecas genéricas HTTP (axios). 
-- **Tolerancia a Códigos 401/403:** Se integró la lógica a `clasificarEstadoHttp()` para categorizar estos códigos como `disponible`, asimilando que existe un aplicativo corriendo (sano) pero requiere provisión de autenticación.
-- **Estado Dinámico según URLs:** El `ServicioMonitoreo.ts` ahora prioriza la disponibilidad HTTPS: si TODAS las URLs asignadas responden `disponible`, ignora los fallos en puertos internos TCP (Network/VLAN unreachability) y clasifica al servidor padre como `ok`. 
-
-### Traducción de UI
-
-- Toda etiqueta y label visible a lo largo de las vistas públicas pasó por una etapa de Localización (l10n), garantizando que botones, tablas de datos y estados de la UI se muestren completamente en Español natural (`Tablero`, `Configuración SMTP`, `Verificando…`).
+```
+server-monitor/
+├── backend/          
+│   └── src/
+│       ├── api/      # Rutas HTTPS/Express y WS Routing
+│       ├── checkers/ # Capas TCP & Protocol HTTP Client Fetchers
+│       ├── services/ # Orquestadores: SMTP, Monitors y Timers.
+│       ├── store/    # Sistema CRUD/Atomic Database JSON.
+│       └── types/    # TS Interfaces Contractuales globales.
+└── frontend/         
+    └── src/
+        ├── components/ # Widgets Cyber-Dark. Modales. Inputs atómicos.
+        ├── hooks/      # Encapsulamiento Fetcher Local
+        ├── services/   # Consumidores API Axios pre-configurados.
+        └── types/      # Equivalente Types.
+```
