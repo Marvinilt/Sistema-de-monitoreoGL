@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { ConfigStore } from '../store/ConfigStore';
 import { VerificadorPuertos } from '../checkers/VerificadorPuertos';
 import { VerificadorHTTPS } from '../checkers/VerificadorHTTPS';
@@ -41,24 +42,40 @@ export class ServicioMonitoreo {
       this.verificadorHTTPS.verificarUrls(servidor.urls),
     ]);
 
-    // Mock: Simular agente que reporta recursos aleatorios
-    // Idealmente: await axios.get(`http://${servidor.host}:9000/metrics`)
     const parametrosConfig = this.store.obtenerConfiguracionParametros();
-    const cpuPorcentaje = Math.random() * 100;
-    const ramPorcentaje = Math.random() * 100;
-    const discoPorcentaje = Math.random() * 100;
+    let cpuPorcentaje = 0;
+    let ramPorcentaje = 0;
+    let discoPorcentaje = 0;
+    let errorAgente: string | undefined;
+
+    try {
+      const resp = await axios.get(`http://${servidor.host}:9000/metrics`, { timeout: 5000 });
+      if (resp.data) {
+        cpuPorcentaje = Number(resp.data.cpuPorcentaje) || 0;
+        ramPorcentaje = Number(resp.data.ramPorcentaje) || 0;
+        discoPorcentaje = Number(resp.data.discoPorcentaje) || 0;
+      } else {
+        errorAgente = 'Respuesta vacía del agente';
+      }
+    } catch (err: any) {
+      console.error(`[ServicioMonitoreo] Error al consultar agente en ${servidor.host}:`, err.message);
+      errorAgente = 'Agente No Disponible';
+    }
 
     const recursos: import('../types').RecursosServidor = {
       cpuPorcentaje,
       ramPorcentaje,
       discoPorcentaje,
       timestamp: new Date().toISOString(),
+      ...(errorAgente ? { error: errorAgente } : {}),
     };
 
     let recursosCríticos = false;
-    if (cpuPorcentaje > parametrosConfig.umbralCpuPorcentaje) recursosCríticos = true;
-    if (ramPorcentaje > parametrosConfig.umbralRamPorcentaje) recursosCríticos = true;
-    if (discoPorcentaje > parametrosConfig.umbralDiscoPorcentaje) recursosCríticos = true;
+    if (!errorAgente) {
+      if (cpuPorcentaje > parametrosConfig.umbralCpuPorcentaje) recursosCríticos = true;
+      if (ramPorcentaje > parametrosConfig.umbralRamPorcentaje) recursosCríticos = true;
+      if (discoPorcentaje > parametrosConfig.umbralDiscoPorcentaje) recursosCríticos = true;
+    }
 
     const estadoBase = determinarEstado(puertos, urls);
     const estadoGeneral: EstadoServidor = recursosCríticos ? 'alerta' : estadoBase;

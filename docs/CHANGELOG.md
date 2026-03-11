@@ -6,11 +6,11 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ## [Unreleased] / [Versión Actual] - 2026-03-10
 ### Added
-- **Monitoreo:** Monitoreo simulado de recursos del sistema (CPU, RAM, Disco).
+- **Monitoreo:** Monitoreo en tiempo real de recursos del sistema (CPU, RAM, Disco) mediante integración con Agente remoto.
 - **Monitoreo/API:** Backend y endpoints para la configuración de umbrales en parámetros de recursos.
 - **UI:** Interfaz para configuración de parámetros y umbrales de recursos del sistema en un panel dedicado (`ParametersView` / `SettingsPanel`).
 - **UI:** Rediseño SaaS "Light Mode" sistemático (claro) con botón (toggle) para alternar temas (Oscuro/Claro) conservado localmente en caché.
-- **UI/Servidores:** Las tarjetas de servidor (`ServerCard`) ahora visualizan dinámicamente el porcentaje y alertas de consumo de CPU, Memoria RAM y Disco.
+- **UI/Servidores:** Las tarjetas de servidor (`ServerCard`) ahora visualizan dinámicamente el porcentaje, alertas de consumo y estado de conexión del Agente de monitoreo.
 
 ### Changed
 - **Configuración:** La `ConfigStore` ahora incluye estructura para manejar y persistir los umbrales de alertas de sistema y temas preferidos.
