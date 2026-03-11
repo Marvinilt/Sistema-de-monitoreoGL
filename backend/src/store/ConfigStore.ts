@@ -72,7 +72,7 @@ export class ConfigStore {
     return this.datos.servidores.find((s) => s.id === id);
   }
 
-  agregarServidor(nombre: string, host: string): Servidor {
+  agregarServidor(nombre: string, host: string, urlAgenteRecursos?: string): Servidor {
     const hostNorm = host.trim().toLowerCase();
     if (!nombre || !nombre.trim()) throw new Error('El nombre del servidor es requerido');
     if (!hostNorm) throw new Error('El host del servidor es requerido');
@@ -86,6 +86,7 @@ export class ConfigStore {
       id: uuidv4(),
       nombre: nombre.trim(),
       host: hostNorm,
+      urlAgenteRecursos: urlAgenteRecursos?.trim() || undefined,
       puertos: [],
       resultadosPuertos: [],
       urls: [],
@@ -106,10 +107,24 @@ export class ConfigStore {
     this.guardar();
   }
 
-  renombrarServidor(id: string, nombre: string): Servidor {
+  actualizarServidorConfig(id: string, nombre: string, host: string, urlAgenteRecursos?: string): Servidor {
     const servidor = this._getServidor(id);
     if (!nombre.trim()) throw new Error('El nombre no puede estar vacío');
+    const hostNorm = host.trim().toLowerCase();
+    if (!hostNorm) throw new Error('El host no puede estar vacío');
+
+    // Revisar colisión de host, si el nuevo host es distinto al actual
+    if (hostNorm !== servidor.host) {
+      const duplicado = this.datos.servidores.find(
+        (s) => s.host.toLowerCase() === hostNorm && s.id !== id
+      );
+      if (duplicado) throw new Error(`Ya existe otro servidor con el host "${hostNorm}"`);
+    }
+
     servidor.nombre = nombre.trim();
+    servidor.host = hostNorm;
+    servidor.urlAgenteRecursos = urlAgenteRecursos?.trim() || undefined;
+
     this.guardar();
     return { ...servidor };
   }

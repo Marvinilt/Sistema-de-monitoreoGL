@@ -23,12 +23,12 @@ export function crearRouter(
   // POST /api/servers
   router.post('/servers', (req: Request, res: Response) => {
     try {
-      const { nombre, host } = req.body;
+      const { nombre, host, urlAgenteRecursos } = req.body;
       if (!nombre || !host) {
         res.status(400).json({ error: 'nombre y host son requeridos' });
         return;
       }
-      const servidor = store.agregarServidor(nombre, host);
+      const servidor = store.agregarServidor(nombre, host, urlAgenteRecursos);
       res.status(201).json(servidor);
     } catch (err) {
       res.status(400).json({ error: (err as Error).message });
@@ -45,15 +45,19 @@ export function crearRouter(
     }
   });
 
-  // PATCH /api/servers/:id — renombrar servidor
+  // PATCH /api/servers/:id — actualizar datos principales del servidor
   router.patch('/servers/:id', (req: Request, res: Response) => {
     try {
-      const { nombre } = req.body;
+      const { nombre, host, urlAgenteRecursos } = req.body;
       if (!nombre || !nombre.trim()) {
         res.status(400).json({ error: 'nombre es requerido' });
         return;
       }
-      const servidor = store.renombrarServidor(req.params.id, nombre.trim());
+      if (!host || !host.trim()) {
+        res.status(400).json({ error: 'host es requerido' });
+        return;
+      }
+      const servidor = store.actualizarServidorConfig(req.params.id, nombre, host, urlAgenteRecursos);
       res.json(servidor);
     } catch (err) {
       res.status(404).json({ error: (err as Error).message });

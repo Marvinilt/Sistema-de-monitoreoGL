@@ -4,6 +4,13 @@ Todos los cambios notables en este proyecto se documentarán en este archivo.
 
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 
+## [2026-03-11]
+
+### Added
+- **Configuración:** Configuración individual por servidor de la variable `urlAgenteRecursos`, permitiendo utilizar un endpoint (por ejemplo, vía un handler `.ashx` en IIS .NET Framework) remoto arbitrario y saltarse la validación obligatoria contra el puerto `9000` estricto en cada máquina local, previniendo así restricciones corporativas de Firewall y SSH.
+- **UI:** Integración del campo de URL del agente de recursos en los modales de creación (AddServerModal) y configuración individual (ServerDetailModal).
+- **Documentación:** Actualización de la guía del agente (`AGENTE_MONITOREO.md`) con la solución alterna para IIS usando .NET Framework (.ashx) y manual de permisos de Performance Monitor Users.
+
 ## [Unreleased] / [Versión Actual] - 2026-03-10
 ### Added
 - **Monitoreo:** Monitoreo en tiempo real de recursos del sistema (CPU, RAM, Disco) mediante integración con Agente remoto.

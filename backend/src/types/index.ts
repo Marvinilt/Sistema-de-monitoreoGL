@@ -25,6 +25,7 @@ export interface Servidor {
   id: string;
   nombre: string;
   host: string; // IP o hostname
+  urlAgenteRecursos?: string; // URL pública del agente ASHX o Node
   puertos: number[];
   resultadosPuertos: ResultadoPuerto[]; // último resultado por puerto
   urls: UrlMonitoreada[];
@@ -103,6 +104,7 @@ export interface ConfiguracionCompleta {
 export interface AgregarServidorDto {
   nombre: string;
   host: string;
+  urlAgenteRecursos?: string;
 }
 
 export interface AgregarPuertoDto {

@@ -25,6 +25,7 @@ export interface Servidor {
   id: string;
   nombre: string;
   host: string;
+  urlAgenteRecursos?: string;
   puertos: number[];
   resultadosPuertos: ResultadoPuerto[]; // último resultado por puerto
   urls: UrlMonitoreada[];

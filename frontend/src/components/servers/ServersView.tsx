@@ -7,7 +7,7 @@ import { useMonitor } from '../../hooks/useMonitor';
 import { Servidor } from '../../types';
 
 export const ServersView: React.FC = () => {
-    const { servidores, agregarServidor, actualizarServidor, renombrarServidor, agregarPuerto, agregarUrl, eliminarPuerto, eliminarUrl } = useServers();
+    const { servidores, agregarServidor, actualizarServidor, actualizarServidorInfo, agregarPuerto, agregarUrl, eliminarPuerto, eliminarUrl } = useServers();
     const [selectedServerId, setSelectedServerId] = useState<string | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -21,7 +21,7 @@ export const ServersView: React.FC = () => {
     const handleAddServer = async (data: AddServerData) => {
         try {
             // Se asume que agregarServidor devuelve el servidor o un ID. Si useServers dice: "return nuevo"
-            const nuevoServidor = await agregarServidor(data.name, data.host);
+            const nuevoServidor = await agregarServidor(data.name, data.host, data.urlAgenteRecursos);
             if (nuevoServidor) {
                 // Agregar puertos iterando
                 if (data.ports && data.ports.length > 0) {
@@ -163,7 +163,7 @@ export const ServersView: React.FC = () => {
                 onRemovePort={eliminarPuerto}
                 onAddUrl={agregarUrl}
                 onRemoveUrl={eliminarUrl}
-                onRename={renombrarServidor}
+                onUpdateInfo={actualizarServidorInfo}
             />
 
             <AddServerModal

@@ -49,7 +49,8 @@ export class ServicioMonitoreo {
     let errorAgente: string | undefined;
 
     try {
-      const resp = await axios.get(`http://${servidor.host}:9000/metrics`, { timeout: 5000 });
+      const agenteUrl = servidor.urlAgenteRecursos || `http://${servidor.host}:9000/metrics`;
+      const resp = await axios.get(agenteUrl, { timeout: 5000 });
       if (resp.data) {
         cpuPorcentaje = Number(resp.data.cpuPorcentaje) || 0;
         ramPorcentaje = Number(resp.data.ramPorcentaje) || 0;
@@ -58,7 +59,7 @@ export class ServicioMonitoreo {
         errorAgente = 'Respuesta vacía del agente';
       }
     } catch (err: any) {
-      console.error(`[ServicioMonitoreo] Error al consultar agente en ${servidor.host}:`, err.message);
+      console.error(`[ServicioMonitoreo] Error al consultar agente en ${servidor.nombre}:`, err.message);
       errorAgente = 'Agente No Disponible';
     }
 

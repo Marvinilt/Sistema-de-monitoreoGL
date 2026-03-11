@@ -11,7 +11,7 @@ export interface ServerDetailModalProps {
     onRemovePort: (id: string, port: number) => Promise<void>;
     onAddUrl: (id: string, url: string) => Promise<void>;
     onRemoveUrl: (id: string, urlId: string) => Promise<void>;
-    onRename: (id: string, nombre: string) => Promise<void>;
+    onUpdateInfo: (id: string, nombre: string, host: string, urlAgenteRecursos?: string) => Promise<void>;
 }
 
 export const ServerDetailModal: React.FC<ServerDetailModalProps> = ({
@@ -23,7 +23,7 @@ export const ServerDetailModal: React.FC<ServerDetailModalProps> = ({
     onRemovePort,
     onAddUrl,
     onRemoveUrl,
-    onRename,
+    onUpdateInfo,
 }) => {
     const modalRef = useRef<HTMLDivElement>(null);
     const nameInputRef = useRef<HTMLInputElement>(null);
@@ -31,11 +31,14 @@ export const ServerDetailModal: React.FC<ServerDetailModalProps> = ({
     const [newUrl, setNewUrl] = useState('');
     const [editingName, setEditingName] = useState(false);
     const [nameValue, setNameValue] = useState('');
+    const [editingAgente, setEditingAgente] = useState(false);
+    const [agenteValue, setAgenteValue] = useState('');
 
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 if (editingName) setEditingName(false);
+                else if (editingAgente) setEditingAgente(false);
                 else onClose();
             }
         };
@@ -44,16 +47,19 @@ export const ServerDetailModal: React.FC<ServerDetailModalProps> = ({
             document.addEventListener('keydown', handleEscape);
             modalRef.current?.focus();
             setNameValue(server?.nombre ?? '');
+            setAgenteValue(server?.urlAgenteRecursos ?? '');
             setEditingName(false);
+            setEditingAgente(false);
         } else {
             setNewPort('');
             setNewUrl('');
             setEditingName(false);
+            setEditingAgente(false);
         }
         return () => {
             document.removeEventListener('keydown', handleEscape);
         };
-    }, [isOpen, onClose, server?.nombre]);
+    }, [isOpen, onClose, server?.nombre, server?.urlAgenteRecursos]);
 
     useEffect(() => {
         if (editingName) nameInputRef.current?.select();
@@ -80,10 +86,18 @@ export const ServerDetailModal: React.FC<ServerDetailModalProps> = ({
 
     const handleConfirmName = async () => {
         const trimmed = nameValue.trim();
-        if (trimmed && trimmed !== server.nombre) {
-            await onRename(server.id, trimmed);
+        if (server && trimmed && trimmed !== server.nombre) {
+            await onUpdateInfo(server.id, trimmed, server.host, server.urlAgenteRecursos);
         }
         setEditingName(false);
+    };
+
+    const handleConfirmAgente = async () => {
+        const trimmed = agenteValue.trim();
+        if (server && trimmed !== (server.urlAgenteRecursos || '')) {
+            await onUpdateInfo(server.id, server.nombre, server.host, trimmed || undefined);
+        }
+        setEditingAgente(false);
     };
 
     const isChecking = server.estado === 'desconocido';
@@ -155,6 +169,49 @@ export const ServerDetailModal: React.FC<ServerDetailModalProps> = ({
                             </span>
                             {isChecking ? 'Verificando...' : 'Forzar Verificación'}
                         </button>
+                    </div>
+
+                    {/* Panel Agente Recursos */}
+                    <div className="flex flex-col gap-2 bg-panel-dark p-4 rounded-xl border border-gray-700/50">
+                        <div className="flex justify-between items-center">
+                            <p className="text-sm font-semibold text-gray-300">URL del Agente de Recursos</p>
+                            {!editingAgente && (
+                                <button onClick={() => setEditingAgente(true)} className="text-xs flex items-center gap-1 text-gray-400 hover:text-accent-neon transition-colors" title="Editar URL del Agente">
+                                    <span className="material-symbols-outlined text-[14px]">edit</span> Editar
+                                </button>
+                            )}
+                        </div>
+                        {editingAgente ? (
+                            <form 
+                                onSubmit={(e) => { e.preventDefault(); handleConfirmAgente(); }}
+                                className="flex gap-2"
+                            >
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    value={agenteValue}
+                                    onChange={(e) => setAgenteValue(e.target.value)}
+                                    placeholder="Ej: https://misitio.com/monitoreo.ashx"
+                                    className="bg-background-dark border border-accent-neon/50 text-gray-200 rounded p-1.5 focus:outline-none focus:ring-1 focus:ring-accent-neon text-sm font-mono flex-1"
+                                />
+                                <button type="submit" className="bg-accent-neon text-black rounded px-3 py-1 text-sm font-bold hover:brightness-110">
+                                    Guardar
+                                </button>
+                                <button type="button" onClick={() => { setAgenteValue(server.urlAgenteRecursos || ''); setEditingAgente(false); }} className="text-gray-400 hover:text-white px-2">
+                                    Cancelar
+                                </button>
+                            </form>
+                        ) : (
+                            <p className="text-sm font-mono text-gray-400 break-all">
+                                {server.urlAgenteRecursos ? (
+                                    <a href={server.urlAgenteRecursos} target="_blank" rel="noreferrer" className="hover:text-accent-neon hover:underline">
+                                        {server.urlAgenteRecursos}
+                                    </a>
+                                ) : (
+                                    <span className="italic">No configurado</span>
+                                )}
+                            </p>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

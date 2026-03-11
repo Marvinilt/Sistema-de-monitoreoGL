@@ -7,14 +7,14 @@ const http = axios.create({ baseURL: '/api' });
 export const obtenerServidores = (): Promise<Servidor[]> =>
   http.get<Servidor[]>('/servers').then((r) => r.data);
 
-export const agregarServidor = (nombre: string, host: string): Promise<Servidor> =>
-  http.post<Servidor>('/servers', { nombre, host }).then((r) => r.data);
+export const agregarServidor = (nombre: string, host: string, urlAgenteRecursos?: string): Promise<Servidor> =>
+  http.post<Servidor>('/servers', { nombre, host, urlAgenteRecursos }).then((r) => r.data);
 
 export const eliminarServidor = (id: string): Promise<void> =>
   http.delete(`/servers/${id}`).then(() => undefined);
 
-export const renombrarServidor = (id: string, nombre: string): Promise<Servidor> =>
-  http.patch<Servidor>(`/servers/${id}`, { nombre }).then((r) => r.data);
+export const actualizarServidorInfo = (id: string, nombre: string, host: string, urlAgenteRecursos?: string): Promise<Servidor> =>
+  http.patch<Servidor>(`/servers/${id}`, { nombre, host, urlAgenteRecursos }).then((r) => r.data);
 
 // Puertos
 export const agregarPuerto = (servidorId: string, puerto: number): Promise<Servidor> =>

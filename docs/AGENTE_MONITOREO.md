@@ -156,3 +156,89 @@ curl http://172.18.X.X:9000/metrics
     *   *Solución Windows:* Abrir Panel de Control -> Firewall de Windows Defender -> Reglas de Entrada -> Crear nueva regla -> Puerto TCP 9000 -> Permitir conexión.
 *   **Todos los porcentajes salen en "0":** Los permisos del usuario que está ejecutando NodeJS (y pm2) no son lo suficientemente altos como para consultar el hardware base (suele pasar en Linux si no pertenece al grupo `wheel`/`sudo`).
 *   **Múltiples unidades de almacenamiento conectadas:** En el código actual del agente (sección de Disco), lee automáticamente la montura `"/"` en Linux o la partición `"C:"` en Windows. Si deseas monitorear discos distintos, edita la condición de `d.mount === 'C:'` en el `agent.js`.
+
+---
+
+## 6. Solución Alterna: Agente en IIS (.NET Framework 4.7.2)
+
+Si el servidor ya corre aplicaciones en IIS y no es factible abrir el puerto `9000` o instalar Node.js/PM2, se puede implementar un Agente ligero usando un **Generic Handler (.ashx)** en VB.NET. Esto permite canalizar las métricas a través del puerto web estándar (`80` o `443`) que ya tiene el servidor.
+
+### 6.1. Crear el archivo `monitoreo.ashx`
+
+Crea un archivo llamado `monitoreo.ashx` en la raíz de tu aplicación IIS (o en una subcarpeta como `api/`) y pega el siguiente código:
+
+```vb
+<%@ WebHandler Language="VB" Class="AgenteMonitoreo" %>
+
+Imports System
+Imports System.Web
+Imports System.Diagnostics
+Imports System.IO
+
+Public Class AgenteMonitoreo : Implements IHttpHandler
+
+    Public Sub ProcessRequest(ByVal context As HttpContext) Implements IHttpHandler.ProcessRequest
+        context.Response.AppendHeader("Access-Control-Allow-Origin", "*")
+        context.Response.ContentType = "application/json"
+        
+        Try
+            ' 1. Uso de CPU
+            Dim cpuCounter As New PerformanceCounter("Processor", "% Processor Time", "_Total")
+            cpuCounter.NextValue() 
+            System.Threading.Thread.Sleep(200) ' Breve pausa física para lectura real
+            Dim cpuPorcentaje As Double = Math.Round(cpuCounter.NextValue(), 2)
+
+            ' 2. Uso de Memoria RAM
+            Dim ramCounter As New PerformanceCounter("Memory", "% Committed Bytes In Use", String.Empty)
+            Dim ramPorcentaje As Double = Math.Round(ramCounter.NextValue(), 2)
+
+            ' 3. Uso de espacio en Disco (Por defecto "C")
+            Dim drive As New DriveInfo("C")
+            Dim discoPorcentaje As Double = 0
+            If drive.IsReady Then
+                Dim discoTotal As Long = drive.TotalSize
+                Dim discoLibre As Long = drive.TotalFreeSpace
+                Dim discoUsado As Long = discoTotal - discoLibre
+                discoPorcentaje = Math.Round((discoUsado / discoTotal) * 100, 2)
+            End If
+
+            ' 4. Respuesta manual en JSON
+            Dim timestamp As String = DateTime.UtcNow.ToString("O")
+            Dim jsonResponse As String = String.Format("{{ ""cpuPorcentaje"": {0}, ""ramPorcentaje"": {1}, ""discoPorcentaje"": {2}, ""timestamp"": ""{3}"" }}", 
+                                                       cpuPorcentaje.ToString(System.Globalization.CultureInfo.InvariantCulture), 
+                                                       ramPorcentaje.ToString(System.Globalization.CultureInfo.InvariantCulture), 
+                                                       discoPorcentaje.ToString(System.Globalization.CultureInfo.InvariantCulture), 
+                                                       timestamp)
+            
+            context.Response.Write(jsonResponse)
+
+        Catch ex As Exception
+            context.Response.StatusCode = 500
+            Dim errorMsg As String = ex.Message.Replace("""", "\""").Replace(vbCrLf, " ")
+            context.Response.Write("{ ""error"": """ & errorMsg & """ }")
+        End Try
+    End Sub
+
+    Public ReadOnly Property IsReusable() As Boolean Implements IHttpHandler.IsReusable
+        Get
+            Return False
+        End Get
+    End Property
+
+End Class
+```
+
+### 6.2. Configuración de Permisos (Crítico)
+
+Para que el proceso de IIS (W3WP.exe) pueda leer los contadores de hardware del sistema, el usuario que ejecuta la aplicación debe pertenecer al grupo de seguridad de Windows **Usuarios del monitor de sistema**.
+
+1.  Abre **Administración de equipos** (`compmgmt.msc`).
+2.  Ve a **Usuarios y grupos locales** -> **Grupos**.
+3.  Busca el grupo **Usuarios del monitor de sistema** (o **Performance Monitor Users**).
+4.  Agrega el usuario que utiliza tu Application Pool. Por defecto suele ser `IIS AppPool\NombreDeTuAppPool` (ej. `IIS AppPool\DefaultAppPool`) o bien el grupo genérico `IIS_IUSRS`.
+5.  **IMPORTANTE:** Es obligatorio **reiniciar el servidor físico** (o al menos el servicio de IIS Admin y el equipo) para que Windows aplique estos permisos sobre las lecturas de hardware.
+
+### 6.3. Ventajas de esta Solución
+- **Transparencia:** No requiere abrir nuevos puertos en el Firewall.
+- **Sin Dependencias:** No requiere Node.js, PM2 ni servicios adicionales instalados.
+- **Parametrizable:** Se puede integrar como un subsitio o archivo drop-in.

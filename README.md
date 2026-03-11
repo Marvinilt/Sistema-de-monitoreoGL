@@ -13,7 +13,7 @@ Aplicación web full-stack para monitorear en tiempo real el estado de puertos T
 
 - **Monitoreo en tiempo real** (TCP/HTTPS) vía WebSockets.
 - **Alertas y notificaciones** por correo electrónico personalizables.
-- **Visualización y configuración de umbrales de consumo de recursos reales** (CPU, RAM, Disco) extrayendo métricas mediante un agente ligero.
+- **Visualización y configuración de umbrales de consumo de recursos reales** (CPU, RAM, Disco) extrayendo métricas mediante un agente ligero, desplegable tanto en Node.js como vía handler customizable en IIS (.NET Framework), soportando parametrización individual de URL por servidor.
 - **Interfaz gráfica moderna** y responsiva, con soporte nativo para **Modos Cyber-Dark y SaaS Light (Claro)**.
 
 ### Tablero Principal

@@ -5,6 +5,7 @@ export interface AddServerData {
     host: string;
     ports?: number[];
     url?: string;
+    urlAgenteRecursos?: string;
 }
 
 export interface AddServerModalProps {
@@ -18,7 +19,8 @@ export const AddServerModal: React.FC<AddServerModalProps> = ({ isOpen, onClose,
     const [host, setHost] = useState('');
     const [portsInput, setPortsInput] = useState('');
     const [urlInput, setUrlInput] = useState('');
-    const [errors, setErrors] = useState<{ name?: string; host?: string; ports?: string; url?: string }>({});
+    const [urlAgenteInput, setUrlAgenteInput] = useState('');
+    const [errors, setErrors] = useState<{ name?: string; host?: string; ports?: string; url?: string; urlAgente?: string }>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Trap focus inside modal logic and Esc close
@@ -36,6 +38,7 @@ export const AddServerModal: React.FC<AddServerModalProps> = ({ isOpen, onClose,
             setHost('');
             setPortsInput('');
             setUrlInput('');
+            setUrlAgenteInput('');
             setErrors({});
             setIsSubmitting(false);
         }
@@ -49,7 +52,7 @@ export const AddServerModal: React.FC<AddServerModalProps> = ({ isOpen, onClose,
     if (!isOpen) return null;
 
     const validate = () => {
-        const newErrors: { name?: string; host?: string; ports?: string; url?: string } = {};
+        const newErrors: { name?: string; host?: string; ports?: string; url?: string; urlAgente?: string } = {};
         if (!name.trim()) newErrors.name = 'El nombre es requerido.';
 
         // IPV4 or hostname regex
@@ -76,6 +79,14 @@ export const AddServerModal: React.FC<AddServerModalProps> = ({ isOpen, onClose,
             }
         }
 
+        if (urlAgenteInput.trim()) {
+            try {
+                new URL(urlAgenteInput);
+            } catch {
+                newErrors.urlAgente = 'La URL del agente debe ser válida (ej: https://ejemplo.com/monitoreo.ashx).';
+            }
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -86,8 +97,9 @@ export const AddServerModal: React.FC<AddServerModalProps> = ({ isOpen, onClose,
             setIsSubmitting(true);
             const parsedPorts = portsInput.trim() ? portsInput.split(',').map(p => Number(p.trim())) : undefined;
             const parsedUrl = urlInput.trim() || undefined;
+            const parsedUrlAgente = urlAgenteInput.trim() || undefined;
             try {
-                await onAdd({ name: name.trim(), host: host.trim(), ports: parsedPorts, url: parsedUrl });
+                await onAdd({ name: name.trim(), host: host.trim(), ports: parsedPorts, url: parsedUrl, urlAgenteRecursos: parsedUrlAgente });
                 onClose();
             } catch (error) {
                 console.error("Error al añadir servidor:", error);
@@ -181,6 +193,22 @@ export const AddServerModal: React.FC<AddServerModalProps> = ({ isOpen, onClose,
                             placeholder="Ej: https://misitio.com"
                         />
                         {errors.url && <p className="text-xs text-danger mt-1">{errors.url}</p>}
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                        <label htmlFor="urlAgente" className="text-sm font-medium text-gray-300 flex items-center justify-between">
+                            <span>URL del Agente de Recursos</span>
+                            <span className="text-xs text-gray-500 font-normal ml-2">(Opcional)</span>
+                        </label>
+                        <input
+                            id="urlAgente"
+                            type="text"
+                            value={urlAgenteInput}
+                            onChange={(e) => setUrlAgenteInput(e.target.value)}
+                            className={`bg-panel-dark border ${errors.urlAgente ? 'border-danger focus:ring-danger' : 'border-gray-600 focus:ring-accent-neon'} text-gray-200 rounded-lg p-2.5 focus:outline-none focus:ring-2 transition-all font-mono`}
+                            placeholder="Ej: https://misitio.com/api/monitoreo.ashx"
+                        />
+                        {errors.urlAgente && <p className="text-xs text-danger mt-1">{errors.urlAgente}</p>}
                     </div>
 
                     <div className="flex justify-end gap-3 mt-6">

@@ -27,14 +27,14 @@ export function useServers() {
     );
   }, []);
 
-  const agregarServidor = useCallback(async (nombre: string, host: string) => {
-    const nuevo = await api.agregarServidor(nombre, host);
+  const agregarServidor = useCallback(async (nombre: string, host: string, urlAgenteRecursos?: string) => {
+    const nuevo = await api.agregarServidor(nombre, host, urlAgenteRecursos);
     setServidores((prev) => [...prev, nuevo]);
     return nuevo;
   }, []);
 
-  const renombrarServidor = useCallback(async (id: string, nombre: string) => {
-    const actualizado = await api.renombrarServidor(id, nombre);
+  const actualizarServidorInfo = useCallback(async (id: string, nombre: string, host: string, urlAgenteRecursos?: string) => {
+    const actualizado = await api.actualizarServidorInfo(id, nombre, host, urlAgenteRecursos);
     setServidores((prev) => prev.map((s) => (s.id === id ? actualizado : s)));
   }, []);
 
@@ -69,7 +69,7 @@ export function useServers() {
     error,
     actualizarServidor,
     agregarServidor,
-    renombrarServidor,
+    actualizarServidorInfo,
     eliminarServidor,
     agregarPuerto,
     eliminarPuerto,
