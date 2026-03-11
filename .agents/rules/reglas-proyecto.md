@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # Reglas Globales del Sistema y Flujo de Desarrollo (Antigravity)
 
 ## 1. Metodología de Branches (GitFlow)
