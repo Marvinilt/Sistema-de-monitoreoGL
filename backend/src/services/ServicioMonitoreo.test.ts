@@ -5,6 +5,10 @@ import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
 
+jest.mock('axios', () => ({
+  get: jest.fn().mockResolvedValue({ data: { cpuPorcentaje: 10, ramPorcentaje: 20, discoPorcentaje: 30 } })
+}));
+
 // ---------------------------------------------------------------------------
 // Tests de integración: ServicioMonitoreo llama a ServicioNotificaciones
 // Validates: Requirements 5.1, 5.3

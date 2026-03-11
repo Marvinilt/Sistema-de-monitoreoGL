@@ -18,6 +18,7 @@ export interface RecursosServidor {
   ramPorcentaje: number;
   discoPorcentaje: number;
   timestamp: string;
+  error?: string;
 }
 
 export interface Servidor {

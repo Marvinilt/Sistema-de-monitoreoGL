@@ -18,6 +18,7 @@ export interface RecursosServidor {
   ramPorcentaje: number;
   discoPorcentaje: number;
   timestamp: string; // ISO 8601
+  error?: string;
 }
 
 export interface Servidor {

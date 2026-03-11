@@ -1,0 +1,156 @@
+PASS src/store/ConfigStore.test.ts
+PASS src/services/ServicioMonitoreo.test.ts
+  ● Console
+
+    console.error
+      [ServicioMonitoreo] Error en procesarResultado: Error: fallo en notificación
+          at Object.<anonymous> (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\src\services\ServicioMonitoreo.test.ts:94:54)
+          at Promise.then.completed (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\utils.js:231:10)
+          at _callCircusTest (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:316:40)
+          at _runTest (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:252:3)
+          at _runTestsForDescribeBlock (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:126:9)
+          at _runTestsForDescribeBlock (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:121:9)
+          at run (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:71:3)
+          at runAndTransformResultsToJestFormat (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
+          at jestAdapter (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
+          at runTestInternal (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-runner\build\runTest.js:367:16)
+          at runTest (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-runner\build\runTest.js:444:34)
+
+    [0m [90m 111 |[39m         [33m.[39mprocesarResultado(servidorAntes[33m,[39m resultado)
+     [90m 112 |[39m         [33m.[39m[36mcatch[39m((err) [33m=>[39m
+    [31m[1m>[22m[39m[90m 113 |[39m           console[33m.[39merror([32m'[ServicioMonitoreo] Error en procesarResultado:'[39m[33m,[39m err)
+     [90m     |[39m                   [31m[1m^[22m[39m
+     [90m 114 |[39m         )[33m;[39m
+     [90m 115 |[39m     }
+     [90m 116 |[39m[0m
+
+      at src/services/ServicioMonitoreo.ts:113:19
+
+PASS src/services/RegistroNotificaciones.test.ts
+PASS src/services/ServicioEmail.test.ts
+  ● Console
+
+    console.log
+      [ServicioEmail] Enviando a admin@test.com via smtp.test.com:587
+
+      at ServicioEmail.enviarNotificacion (src/services/ServicioEmail.ts:148:15)
+
+    console.log
+      [ServicioEmail] Correo enviado: [Monitor Servidores] 1 cambio(s) detectado(s) - 10/03/2026 22:09
+
+      at ServicioEmail.enviarNotificacion (src/services/ServicioEmail.ts:155:15)
+
+    console.log
+      [ServicioEmail] Enviando a admin@test.com via smtp.test.com:587
+
+      at ServicioEmail.enviarNotificacion (src/services/ServicioEmail.ts:148:15)
+
+    console.log
+      [ServicioEmail] Correo enviado: [Monitor Servidores] 3 cambio(s) detectado(s) - 10/03/2026 22:09
+
+      at ServicioEmail.enviarNotificacion (src/services/ServicioEmail.ts:155:15)
+
+    console.log
+      [ServicioEmail] Enviando a admin@test.com via smtp.test.com:587
+
+      at ServicioEmail.enviarNotificacion (src/services/ServicioEmail.ts:148:15)
+
+    console.error
+      [ServicioEmail] Error al enviar notificación: Error: Connection timeout
+          at Object.<anonymous> (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\src\services\ServicioEmail.test.ts:176:36)
+          at Promise.then.completed (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\utils.js:231:10)
+          at _callCircusTest (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:316:40)
+          at _runTest (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:252:3)
+          at _runTestsForDescribeBlock (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:126:9)
+          at _runTestsForDescribeBlock (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:121:9)
+          at run (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:71:3)
+          at runAndTransformResultsToJestFormat (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
+          at jestAdapter (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
+          at runTestInternal (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-runner\build\runTest.js:367:16)
+          at runTest (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-runner\build\runTest.js:444:34)
+
+    [0m [90m 156 |[39m     } [36mcatch[39m (error) {
+     [90m 157 |[39m       [90m// Req 4.5, 4.6: loguear sin relanzar[39m
+    [31m[1m>[22m[39m[90m 158 |[39m       console[33m.[39merror([32m'[ServicioEmail] Error al enviar notificación:'[39m[33m,[39m error)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 159 |[39m     }
+     [90m 160 |[39m   }
+     [90m 161 |[39m }[0m
+
+      at ServicioEmail.enviarNotificacion (src/services/ServicioEmail.ts:158:15)
+      at Object.<anonymous> (src/services/ServicioEmail.test.ts:180:5)
+
+PASS src/checkers/VerificadorHTTPS.test.ts
+PASS src/services/Planificador.test.ts
+  ● Console
+
+    console.error
+      [Planificador] Error en verificación periódica: Error: fallo simulado
+          at Object.<anonymous> (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\src\services\Planificador.test.ts:56:51)
+          at Promise.then.completed (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\utils.js:231:10)
+          at _callCircusTest (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:316:40)
+          at _runTest (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:252:3)
+          at _runTestsForDescribeBlock (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:126:9)
+          at _runTestsForDescribeBlock (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:121:9)
+          at run (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:71:3)
+          at runAndTransformResultsToJestFormat (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
+          at jestAdapter (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
+          at runTestInternal (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-runner\build\runTest.js:367:16)
+          at runTest (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-runner\build\runTest.js:444:34)
+
+    [0m [90m 30 |[39m       [36mawait[39m [36mthis[39m[33m.[39mservicio[33m.[39mverificarTodos()[33m;[39m
+     [90m 31 |[39m     } [36mcatch[39m (err) {
+    [31m[1m>[22m[39m[90m 32 |[39m       console[33m.[39merror([32m'[Planificador] Error en verificación periódica:'[39m[33m,[39m err)[33m;[39m
+     [90m    |[39m               [31m[1m^[22m[39m
+     [90m 33 |[39m     }
+     [90m 34 |[39m   }
+     [90m 35 |[39m[0m
+
+      at Planificador.ejecutarCiclo (src/services/Planificador.ts:32:15)
+      at Object.<anonymous> (src/services/Planificador.test.ts:62:5)
+
+    console.error
+      [Planificador] Error en verificación periódica: Error: error de notificación
+          at Object.<anonymous> (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\src\services\Planificador.test.ts:71:35)
+          at C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-mock\build\index.js:397:39
+          at Object.<anonymous> (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-mock\build\index.js:404:13)
+          at Object.mockConstructor [as verificarTodos] (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-mock\build\index.js:148:19)
+          at Planificador.ejecutarCiclo (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\src\services\Planificador.ts:30:27)
+          at Object.<anonymous> (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\src\services\Planificador.test.ts:79:31)
+          at Promise.then.completed (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\utils.js:231:10)
+          at _callCircusTest (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:316:40)
+          at _runTest (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:252:3)
+          at _runTestsForDescribeBlock (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:126:9)
+          at _runTestsForDescribeBlock (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:121:9)
+          at run (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\run.js:71:3)
+          at runAndTransformResultsToJestFormat (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
+          at jestAdapter (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
+          at runTestInternal (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-runner\build\runTest.js:367:16)
+          at runTest (C:\Proyectos Desarrollo IA\Sistema de monitoreoGL\backend\node_modules\jest-runner\build\runTest.js:444:34)
+
+    [0m [90m 30 |[39m       [36mawait[39m [36mthis[39m[33m.[39mservicio[33m.[39mverificarTodos()[33m;[39m
+     [90m 31 |[39m     } [36mcatch[39m (err) {
+    [31m[1m>[22m[39m[90m 32 |[39m       console[33m.[39merror([32m'[Planificador] Error en verificación periódica:'[39m[33m,[39m err)[33m;[39m
+     [90m    |[39m               [31m[1m^[22m[39m
+     [90m 33 |[39m     }
+     [90m 34 |[39m   }
+     [90m 35 |[39m[0m
+
+      at Planificador.ejecutarCiclo (src/services/Planificador.ts:32:15)
+      at Object.<anonymous> (src/services/Planificador.test.ts:79:5)
+
+PASS src/services/ServicioNotificaciones.test.ts
+
+Test Suites: 7 passed, 7 total
+Tests:       55 passed, 55 total
+Snapshots:   0 total
+Time:        6.061 s, estimated 9 s
+Ran all test suites.

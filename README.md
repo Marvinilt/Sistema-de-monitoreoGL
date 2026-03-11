@@ -1,6 +1,11 @@
 # Monitor de Servidores e Infraestructura
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue) ![Node](https://img.shields.io/badge/node_v18+-green)
+![Version 1.0.0](https://img.shields.io/badge/version-1.0.0-blue)
+![NodeJS](https://img.shields.io/badge/Node.js-v18+-6DA55F?logo=node.js&logoColor=white)
+![React](https://img.shields.io/badge/React-v18.2.0-%2320232a.svg?logo=react&logoColor=%2361DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-v5.2.2-%23007ACC.svg?logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v3.3.5-%2338B2AC.svg?logo=tailwind-css&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-v4.18.2-%23404d59.svg?logo=express&logoColor=%2361DAFB)
 
 Aplicación web full-stack para monitorear en tiempo real el estado de puertos TCP y URLs HTTPS en servidores de infraestructura con una interfaz cyber-dark futurista.
 
@@ -8,7 +13,7 @@ Aplicación web full-stack para monitorear en tiempo real el estado de puertos T
 
 - **Monitoreo en tiempo real** (TCP/HTTPS) vía WebSockets.
 - **Alertas y notificaciones** por correo electrónico personalizables.
-- **Visualización y configuración de umbrales de consumo de recursos** (CPU, RAM, Disco).
+- **Visualización y configuración de umbrales de consumo de recursos reales** (CPU, RAM, Disco) extrayendo métricas mediante un agente ligero.
 - **Interfaz gráfica moderna** y responsiva, con soporte nativo para **Modos Cyber-Dark y SaaS Light (Claro)**.
 
 ### Tablero Principal

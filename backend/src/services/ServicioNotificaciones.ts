@@ -23,7 +23,7 @@ export class ServicioNotificaciones {
     private store: ConfigStore,
     private registro: RegistroNotificaciones,
     private servicioEmail: IServicioEmail
-  ) {}
+  ) { }
 
   /**
    * Procesa el resultado de una verificación comparando con el estado anterior.
@@ -43,10 +43,10 @@ export class ServicioNotificaciones {
     }
 
     const cambios = this.detectarCambios(servidorAntes, resultado);
-    
+
     if (cambios.length === 0) return;
     console.log(`[ServicioNotificaciones] Cambios detectados para ${servidorAntes.nombre}: ${cambios.length}`);
-    
+
     // Filtrar cambios ya notificados (Req 3.2, 3.3)
     const nuevos = cambios.filter((c) => !this.registro.yaNotificado(c));
     console.log(`[ServicioNotificaciones] Cambios nuevos (no deduplicados): ${nuevos.length}`);
@@ -150,14 +150,16 @@ export class ServicioNotificaciones {
     }
 
     // --- Recursos ---
-    if (resultado.recursos && servidorAntes.recursos) {
+    // Si hay error en los recursos (p. ej. Agente No Disponible), no disparamos notificaciones 
+    // falsas de que los recursos cayeron a 0%.
+    if (resultado.recursos && servidorAntes.recursos && !resultado.recursos.error) {
       const configParam = this.store.obtenerConfiguracionParametros();
       const uCPU = configParam.umbralCpuPorcentaje;
       const uRAM = configParam.umbralRamPorcentaje;
       const uDisco = configParam.umbralDiscoPorcentaje;
 
       const evalEstado = (valor: number, umbral: number) => (valor > umbral ? 'alerta' : 'ok');
-      
+
       const resAntes = servidorAntes.recursos;
       const resNuevo = resultado.recursos;
 
