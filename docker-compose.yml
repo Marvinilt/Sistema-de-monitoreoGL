@@ -1,0 +1,41 @@
+version: '3.8'
+
+networks:
+  monitor_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.200.0.0/16
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: monitoreogl-backend
+    ports:
+      - "${BACKEND_PORT:-3001}:3001" # Expose for debugging or direct access if needed
+    volumes:
+      # Mount the data directory to persist configurations and notifications
+      - ./backend/data:/app/data
+    restart: always
+    environment:
+      - PORT=3001
+      - NODE_ENV=production
+      - NODE_TLS_REJECT_UNAUTHORIZED=0 # Prevent self-signed cert blocks in internal Alpine container
+    networks:
+      - monitor_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: monitoreogl-frontend
+    ports:
+      - "${FRONTEND_PORT:-8080}:80" # Map host port to container port 80
+    depends_on:
+      - backend
+    restart: always
+    networks:
+      - monitor_net
+

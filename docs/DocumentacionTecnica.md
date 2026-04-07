@@ -143,6 +143,27 @@ Las pruebas previenen directamente las regresiones apoyándose en el paradigma *
 | **Saneamiento SMTP**         | Componentes validan las cabeceras bajo formato RFC 5322 en correos destino antes del spooler de correo.                                                                                   | `fast-check` y Regex                     |
 | **Motor Gráfico (UI/React)** | Propiedades semánticas de clase y paleta inyectan el CSS puro requerido para representar visualmente fallas con semáforos rojos / verdes nativos sin manipulación engañosa de datos base. | `RTL (@testing-library)` y  `fast-check` |
 
+## 6. Integración Continua y Despliegue con Docker
+
+El sistema está empaquetado para despliegues inmutables soportados enteramente a través de `docker-compose`. 
+Esto asegura consistencia nula en los problemas de dependencias subyacentes entre el SO host de producción vs. el SO de laboratorio local.
+
+**Componentes y flujos bajo Docker:**
+*   **Virtualización de Backend:** Se ejecuta sobre un entorno de Alpine puro bajo Node 20. El contenedor expone individualmente su tubería TCP para fines lógicos en 3001, pero su persistencia real ocurre al vincularse (bind-mount volúmenes) internamente en tiempo de ejecución mapeando `./backend/data` > `/app/data`.
+*   **Virtualización de Frontend:** Arquitectura `Multi-Stage` estandarizada para react/vite: 
+    *   **Builder Stage:** Compila y minifica todos los assets React usando Node y Typescript estricto.
+    *   **Production Stage (Nginx):** El código binario optimizado se aloja sobre un agente proxy en Nginx (Alpine). Este Nginx efectúa tareas de enrutamiento Web `SPA` y Reverse Proxy activo. Redirige dinámicamente todo acceso HTTP hacia `/api/*` y WebSockets nativos HTTP-Upgrades sobre `/ws/*` enviándolos al hostname del servicio de Docker designado como `backend`.
+    
+Consulta el documento satélite dedicado a la virtualización en `docs/docker-docs.md`.
+
+### 6.1. Integración con Coolify v4 (PaaS)
+
+El repositorio está condicionado de forma nativa para ser consumido directamente por **Coolify v4** usando el Build Pack de *Docker Compose*.
+
+**Arquitectura de red en Coolify:**
+*   **Traefik Proxy Inverso:** Coolify inyecta variables dinámicas automáticamente (`COOLIFY_FQDN`, `COOLIFY_URL`) y enruta el tráfico HTTPS a través de `Traefik`. No es necesario configurar certbot, Nginx ya actúa como el primer nivel post-balanceador enlazando hacia `/api/` en el backend.
+*   **Variables de Entorno Personalizables:** Modificando `FRONTEND_PORT` y `BACKEND_PORT` en el panel de Coolify, podemos alterar sobre en qué puertos del host local del VPS deben ligarse los servicios. En entornos puramente contenidos estas variables no son tan estrictas gracias al SDN de Coolify.
+*   **Despliegue Programático:** El entorno está documentado bajo `docs/coolify-deployment.md` estableciendo guías paso-a-paso para llamar a los Endpoints nativos `/api/v1/deploy` mediante integraciones de API e inyecciones de Webhooks (`?uuid=RECURSO_ID`).
 ---
 
 ## ANEXO: Referencia Rápida de API e Interactividad

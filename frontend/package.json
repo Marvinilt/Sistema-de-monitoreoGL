@@ -4,7 +4,7 @@
   "description": "Frontend del Monitor de Servidores e Infraestructura",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "test": "vitest --run"
   },

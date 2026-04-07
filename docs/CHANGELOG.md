@@ -4,6 +4,19 @@ Todos los cambios notables en este proyecto se documentarán en este archivo.
 
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 
+## [Unreleased] / [Versión Actual] - 2026-04-07
+
+### Added
+- **Docker/Deploy:** Variables de puertos (`FRONTEND_PORT`, `BACKEND_PORT`) parametrizables en `docker-compose.yml` para soportar despliegue en host y escalabilidad manual sin conflictos.
+- **Documentación:** Agregada guía de publicación detallada para Coolify v4 (`docs/coolify-deployment.md`), describiendo integraciones UI, variables de entorno, Traefik proxy, y endpoints de despliegue mediante Webhooks y API automatizada (cURL).
+- **Docker:** Soporte oficial para despliegue contenerizado de la plataforma completa. Inclusión de orquestador `docker-compose.yml`, optimización multi-stage nativa con proxy dinámico Nginx en Frontend y persistencia de resiliencia mediante volúmenes.
+- **Documentación:** Agregado documento instruccional `docs/docker-docs.md` explicando detalles del ecosistema de micro-contenedores.
+
+## [1.5.0] - 2026-03-11
+### Added
+- **Configuración:** Configuración individual por servidor de la variable `urlAgenteRecursos`, permitiendo utilizar un endpoint (por ejemplo, vía un handler `.ashx` en IIS .NET Framework) remoto arbitrario y saltarse la validación obligatoria contra el puerto `9000` estricto en cada máquina local, previniendo así restricciones corporativas de Firewall y SSH.
+- **UI:** Integración del campo de URL del agente de recursos en los modales de creación (AddServerModal) y configuración individual (ServerDetailModal).
+- **Documentación:** Actualización de la guía del agente (`AGENTE_MONITOREO.md`) con la solución alterna para IIS usando .NET Framework (.ashx) y manual de permisos de Performance Monitor Users.
 ## [Unreleased] / [Versión Actual] - 2026-03-10
 ### Added
 - **Monitoreo:** Monitoreo en tiempo real de recursos del sistema (CPU, RAM, Disco) mediante integración con Agente remoto.

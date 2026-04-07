@@ -24,6 +24,17 @@ Aplicación web full-stack para monitorear en tiempo real el estado de puertos T
 
 ## 🚀 Inicio rápido
 
+### Vía Docker (Recomendado)
+
+Requiere tener [Docker](https://www.docker.com/) instalado en tu entorno.
+
+```bash
+docker-compose up -d --build
+```
+La interfaz web del sistema se publicará de manera inmediata en **`http://localhost:8080`**. Todos los datos y configuraciones persistirán automáticamente usando volúmenes nativos.
+
+### Vía Local (Entorno de Desarrollo)
+
 ```bash
 # Instalar dependencias
 npm run install:all
@@ -49,6 +60,7 @@ npm test
 
 Para detalles profundos sobre el funcionamiento interno, dirígete a nuestros documentos:
 - 📖 [Documentación Técnica (API, Arquitectura, WebSockets)](docs/DocumentacionTecnica.md)
+- ☁️ [Guía de Publicación en Coolify v4](docs/coolify-deployment.md)
 - 📝 [Historial de Cambios (Changelog)](docs/CHANGELOG.md)
 
 ## 📄 Licencia y Contacto
