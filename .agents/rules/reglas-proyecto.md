@@ -22,7 +22,7 @@ trigger: always_on
 
 Cuando el usuario indique que ha finalizado el desarrollo realiza siempre las siguientes acciones obligatorias:
 
-    a. Actualiza `Changelog.md` con la nueva funcionalidad desarrollada (fecha y descripción detallada del desarrollo realizado), en orden cronológico inverso. No mezcles todo, agrupa los cambios bajo estos encabezados estándar:
+    1. Actualiza `Changelog.md` con la nueva funcionalidad desarrollada (fecha y descripción detallada del desarrollo realizado), en orden cronológico inverso. No mezcles todo, agrupa los cambios bajo estos encabezados estándar:
           * Added: Para funciones nuevas.
           * Changed: Para cambios en funciones existentes.
           * Deprecated: Para funciones que se eliminarán en versiones futuras.
@@ -30,11 +30,11 @@ Cuando el usuario indique que ha finalizado el desarrollo realiza siempre las si
           * Fixed: Para cualquier corrección de errores (Bug fixes).
           * Security: En caso de vulnerabilidades.
     
-    b. Actualiza `README.md` con la nueva funcionalidad desarrollada (instrucciones, fecha y descripción de feature).
-    c. Actualiza `docs/DocumentacionTecnica.md` con la nueva funcionalidad desarrollada (arquitectura, diagrama de arquitectura, diagrama de comunicación entre componentes, documentación de endpoints, diseño, librerias utilizadas, requisitos técnicos, etc.)
-    d. Asegúrate de crear o actualizar los Tests Unitarios correspondientes y verifica que pasen exitosamente (`npm test`).
-    e. Realiza el commit de todos los cambios con una descripción detallada del desarrollo y has push al feature branch.
-    f. Crea un Pull Request del feature branch hacia `develop` con título `feat(<scope>): <descripción>`.
+    2. Actualiza `README.md` con la nueva funcionalidad desarrollada (instrucciones, fecha y descripción de feature).
+    3. Actualiza `docs/DocumentacionTecnica.md` con la nueva funcionalidad desarrollada (arquitectura, diagrama de arquitectura, diagrama de comunicación entre componentes, documentación de endpoints, diseño, librerias utilizadas, requisitos técnicos, etc.)
+    4. Asegúrate de crear o actualizar los Tests Unitarios correspondientes y verifica que pasen exitosamente (`npm test`).
+    5. Realiza el commit de todos los cambios con una descripción detallada del desarrollo y has push al feature branch.
+    6. Crea un Pull Request del feature branch hacia `develop` con título `feat(<scope>): <descripción>`.
 
 ## 3. Reglas de desarrollo  
 
